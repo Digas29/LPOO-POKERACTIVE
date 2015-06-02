@@ -1,6 +1,5 @@
 package com.utils;
 
-import com.badlogic.gdx.Gdx;
 import com.states.InitialState;
 import com.states.StrategyState;
 
@@ -45,7 +44,7 @@ public class StateMachine {
 		default:
 			break;
 		}
-		Gdx.graphics.requestRendering();
+		currentState.create();
 	}
 	
 	public GameState getCurrentState() {
