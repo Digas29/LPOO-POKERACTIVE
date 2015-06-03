@@ -34,7 +34,6 @@ public class StrategyState implements GameState{
 		textureBackgroud = new Texture(Gdx.files.internal("img/strategy.png"));
 		atlas = new TextureAtlas(Gdx.files.internal("img/buttons.atlas"));
 		stage = new Stage();
-		Gdx.input.setInputProcessor(stage);
 		create();
 	}
 	@Override
@@ -46,10 +45,12 @@ public class StrategyState implements GameState{
 	@Override
 	public void dispose() {
 		textureBackgroud.dispose();
+		skin.dispose();
 		stage.dispose();
 	}
 	@Override
 	public void create() {
+		Gdx.input.setInputProcessor(stage);
 		TextureRegion region = new TextureRegion(textureBackgroud, 0, 0, textureBackgroud.getWidth(), textureBackgroud.getHeight());          
         Image actor = new Image(region);
         stage.addActor(actor);
@@ -70,11 +71,19 @@ public class StrategyState implements GameState{
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
 				super.clicked(event, x, y);
-				StateMachine.getStateMachine().switchState(States.INITIAL);
+				StateMachine.getStateMachine().switchState(States.CHOOSE_NAME);
 			}
         	
         });
         clientButton = new TextButton("JOGADOR", style);
+        clientButton.addListener(new ClickListener(){
+			@Override
+			public void clicked(InputEvent event, float x, float y) {
+				super.clicked(event, x, y);
+				StateMachine.getStateMachine().switchState(States.CHOOSE_NAME);
+			}
+        	
+        });
         table.add(serverButton).row();
         table.getCell(serverButton).spaceBottom(75.0f);
         table.add(clientButton).row();
