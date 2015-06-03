@@ -65,7 +65,7 @@ public class ChooseNameState implements GameState {
 			public boolean keyDown(InputEvent event, int keycode) {
 				super.keyDown(event, keycode);
 				if(keycode == Keys.ENTER){
-					StateMachine.getStateMachine().switchState(States.INITIAL);
+					StateMachine.getStateMachine().switchState(States.CHOOSE_ROOM);
 					//TODO Guardar nome System.out.print(textField.getText());
 					return true;
 				}

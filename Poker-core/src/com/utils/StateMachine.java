@@ -1,6 +1,7 @@
 package com.utils;
 
 import com.states.ChooseNameState;
+import com.states.ChooseRoomState;
 import com.states.InitialState;
 import com.states.StrategyState;
 
@@ -10,7 +11,7 @@ public class StateMachine {
 	
 	public enum States{
 		PLAY,
-		MAIN_MENU,
+		CHOOSE_ROOM,
 		CHOOSE_NAME,
 		INITIAL,
 		STRATEGY
@@ -20,6 +21,7 @@ public class StateMachine {
 	private InitialState initial = new InitialState();
 	private StrategyState strategy = new StrategyState();
 	private ChooseNameState chooseName = new ChooseNameState();
+	private ChooseRoomState chooseRoom = new ChooseRoomState();
 	private static StateMachine machine = null;
 	
 	protected StateMachine(){
@@ -42,7 +44,8 @@ public class StateMachine {
 			break;
 		case PLAY:
 			break;
-		case MAIN_MENU:
+		case CHOOSE_ROOM:
+			currentState = chooseRoom;
 			break;
 		case CHOOSE_NAME:
 			currentState = chooseName;
