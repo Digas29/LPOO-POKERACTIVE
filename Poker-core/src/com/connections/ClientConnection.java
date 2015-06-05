@@ -101,7 +101,6 @@ public class ClientConnection extends ConnectionStrategy {
 
 			@Override
 			public void onGetLiveRoomInfoDone(LiveRoomInfoEvent arg0) {
-				Gdx.app.log("c", "my informative message");
 				rooms.add(arg0.getData());
 				if(arg0.getJoinedUsers() == null){
 					nrPlayers.add(0);
@@ -110,7 +109,6 @@ public class ClientConnection extends ConnectionStrategy {
 					nrPlayers.add(arg0.getJoinedUsers().length);
 				}
 				if(rooms.size() == totalRooms){
-					Gdx.app.log("cenas2000", "my informative message");
 					StateMachine.getStateMachine().switchState(States.CHOOSE_ROOM);
 				}
 			}

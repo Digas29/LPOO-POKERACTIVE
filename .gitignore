@@ -1,3 +1,6 @@
 .metadata/
 .recommenders/
 .Poker_LPOO/
+.Poker-android/.classpath
+.Poker-desktop/.classpath
+.Poker-core/.classpath
