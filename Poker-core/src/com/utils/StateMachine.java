@@ -1,6 +1,5 @@
 package com.utils;
 
-import com.badlogic.gdx.Gdx;
 import com.states.ChooseNameState;
 import com.states.ChooseRoomState;
 import com.states.InitialState;
@@ -30,7 +29,7 @@ public class StateMachine {
 	
 	protected StateMachine(){
 		currentState = initial;
-		currentState.resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+		currentState.create();
 	}
 	
 	public static StateMachine getStateMachine(){

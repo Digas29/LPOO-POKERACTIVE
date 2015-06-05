@@ -16,6 +16,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.utils.GameState;
 import com.utils.StateMachine;
 import com.utils.StateMachine.States;
@@ -34,7 +35,7 @@ public class StrategyState implements GameState{
 		font = new BitmapFont(Gdx.files.internal("fonts/trench.fnt"));
 		textureBackgroud = new Texture(Gdx.files.internal("img/strategy.png"));
 		atlas = new TextureAtlas(Gdx.files.internal("img/buttons.atlas"));
-		stage = new Stage();
+		stage = new Stage(new StretchViewport(1920, 1080));
 	}
 	@Override
 	public void render() {
@@ -57,7 +58,7 @@ public class StrategyState implements GameState{
         
         skin = new Skin(atlas);
         table = new Table(skin);
-        table.setBounds(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        table.setBounds(0, 0, stage.getWidth(), stage.getHeight());
         
         TextButtonStyle style = new TextButtonStyle();
         style.font = font;

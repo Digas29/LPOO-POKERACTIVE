@@ -19,6 +19,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField.TextFieldStyle;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.connections.ClientConnection;
 import com.utils.GameState;
 
@@ -41,7 +42,7 @@ public class ChooseRoomState implements GameState {
 		atlas = new TextureAtlas(Gdx.files.internal("img/table.atlas"));
 		skin = new Skin(atlas);
 		textureBackgroud = new Texture(Gdx.files.internal("img/strategy.png"));
-		stage = new Stage();
+		stage = new Stage(new StretchViewport(1920, 1080));
 		fontBlack = new BitmapFont(Gdx.files.internal("fonts/trench.fnt"));
 		fontRed = new BitmapFont(Gdx.files.internal("fonts/trench_red.fnt"));
 	}
@@ -56,7 +57,7 @@ public class ChooseRoomState implements GameState {
 		
 		pane = new ScrollPane(rows);
 		
-		table.setBounds(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+		table.setBounds(0, 0, stage.getWidth(), stage.getHeight());
 		rows.setBounds(0, 0, Gdx.graphics.getWidth()*20, Gdx.graphics.getHeight()*20);
 		TextureRegion region = new TextureRegion(textureBackgroud, 0, 0, textureBackgroud.getWidth(), textureBackgroud.getHeight());          
         Image background = new Image(region);

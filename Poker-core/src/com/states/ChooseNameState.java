@@ -22,6 +22,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField.OnscreenKeyboard;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField.TextFieldStyle;
 import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.connections.ClientConnection;
 import com.connections.ServerConnection;
 import com.utils.ConnectionStrategy;
@@ -45,10 +46,10 @@ public class ChooseNameState implements GameState {
 	
 	public ChooseNameState(){
 		keyboardOnScreen = false;
+		stage = new Stage(new StretchViewport(1920, 1080));
 		atlas = new TextureAtlas(Gdx.files.internal("img/buttons.atlas"));
 		skin = new Skin(atlas);
 		textureBackgroud = new Texture(Gdx.files.internal("img/strategy.png"));
-		stage = new Stage();
 		fontBlack = new BitmapFont(Gdx.files.internal("fonts/trench.fnt"));
 		fontRed = new BitmapFont(Gdx.files.internal("fonts/trench_red.fnt"));
 	}
@@ -63,7 +64,7 @@ public class ChooseNameState implements GameState {
         
 		table = new Table();
         
-		table.setBounds(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+		table.setBounds(0, 0, stage.getWidth(), stage.getHeight());
 		TextureRegion region = new TextureRegion(textureBackgroud, 0, 0, textureBackgroud.getWidth(), textureBackgroud.getHeight());          
         Image background = new Image(region);
         stage.addActor(background);

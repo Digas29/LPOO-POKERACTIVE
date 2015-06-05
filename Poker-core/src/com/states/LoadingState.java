@@ -14,6 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField.TextFieldStyle;
 import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.utils.GameState;
 
 public class LoadingState implements GameState {
@@ -25,7 +26,7 @@ public class LoadingState implements GameState {
 	private BitmapFont fontRed;
 	
 	public LoadingState(){
-		stage = new Stage();
+		stage = new Stage(new StretchViewport(1920, 1080));
 		textureChip = new Texture(Gdx.files.internal("img/chipRed.png"));
 		fontRed = new BitmapFont(Gdx.files.internal("fonts/trench_red.fnt"));
 	}
@@ -34,8 +35,8 @@ public class LoadingState implements GameState {
 		Gdx.input.setInputProcessor(stage);
 		        
 		table = new Table();
-        
-		table.setBounds(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+		table.setBounds(0, 0, stage.getWidth(), stage.getHeight());
+		
 		TextureRegion region = new TextureRegion(textureChip, 0, 0, textureChip.getWidth(), textureChip.getHeight());          
 		Image chip = new Image(region);
 		chip.setOrigin(textureChip.getWidth()/2, textureChip.getHeight()/2);
