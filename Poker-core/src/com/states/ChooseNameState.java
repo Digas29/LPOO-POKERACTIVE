@@ -1,9 +1,13 @@
 package com.states;
 
 
+import com.Poker.Poker;
+import com.badlogic.gdx.Application;
+import com.badlogic.gdx.Application.ApplicationType;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
@@ -15,11 +19,13 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
+import com.badlogic.gdx.scenes.scene2d.ui.TextField.OnscreenKeyboard;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField.TextFieldStyle;
 import com.badlogic.gdx.utils.Align;
+import com.connections.ClientConnection;
+import com.connections.ServerConnection;
+import com.utils.ConnectionStrategy;
 import com.utils.GameState;
-import com.utils.StateMachine;
-import com.utils.StateMachine.States;
 
 public class ChooseNameState implements GameState {
 	
@@ -32,20 +38,27 @@ public class ChooseNameState implements GameState {
 	private Skin skin;
 	private BitmapFont fontBlack;
 	private BitmapFont fontRed;
+	private OrthographicCamera cam;
+	private boolean keyboardOnScreen;
 	
 	public ChooseNameState(){
+		keyboardOnScreen = false;
 		atlas = new TextureAtlas(Gdx.files.internal("img/buttons.atlas"));
 		skin = new Skin(atlas);
 		textureBackgroud = new Texture(Gdx.files.internal("img/strategy.png"));
 		stage = new Stage();
 		fontBlack = new BitmapFont(Gdx.files.internal("fonts/trench.fnt"));
 		fontRed = new BitmapFont(Gdx.files.internal("fonts/trench_red.fnt"));
-		create();
 	}
 	@Override
 	public void create() {
 		Gdx.input.setInputProcessor(stage);
 		
+		cam = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        cam.position.set(Gdx.graphics.getWidth()/2f, Gdx.graphics.getHeight()/2f, 0);
+        cam.update();
+        stage.getViewport().setCamera(cam);
+        
 		table = new Table();
         
 		table.setBounds(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
@@ -59,20 +72,49 @@ public class ChooseNameState implements GameState {
         style.fontColor = Color.BLACK;
         textField = new TextField("", style);
         textField.setAlignment(Align.center);
+        textField.setOnscreenKeyboard(new OnscreenKeyboard() {
+            @Override
+            public void show(boolean visible) {
+            	if(Gdx.app.getType() == ApplicationType.Android && visible){
+            		Gdx.input.setOnscreenKeyboardVisible(true);
+            		if(!keyboardOnScreen){
+            			cam.translate(0, -Gdx.graphics.getHeight() * 0.4f);
+            			cam.update();
+            		}
+            		keyboardOnScreen = true;
+            	}
+            	else if(Gdx.app.getType() == ApplicationType.Android && !visible){
+            		Gdx.input.setOnscreenKeyboardVisible(false);
+            		if(keyboardOnScreen){
+            			cam.translate(0, Gdx.graphics.getHeight() * 0.4f);
+            			cam.update();
+            		}
+            		keyboardOnScreen = false;
+            	}
+            }
+        });
         textField.addListener(new InputListener(){
 
 			@Override
 			public boolean keyDown(InputEvent event, int keycode) {
 				super.keyDown(event, keycode);
 				if(keycode == Keys.ENTER){
-					StateMachine.getStateMachine().switchState(States.CHOOSE_ROOM);
-					//TODO Guardar nome System.out.print(textField.getText());
+					Gdx.app.setLogLevel(Application.LOG_DEBUG);
+					ConnectionStrategy connection;
+					if(Poker.isServer()){
+						connection = new ServerConnection();
+					}
+					else{
+						connection = new ClientConnection();						
+					}
+					connection.connect(textField.getText());
 					return true;
 				}
 				return false;
 			}
         	
         });
+        
         
         TextFieldStyle styleLabel = new TextFieldStyle();
         styleLabel.fontColor = Color.RED;

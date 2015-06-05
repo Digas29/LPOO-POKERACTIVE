@@ -55,7 +55,9 @@ public class StateMachine {
 		}
 		currentState.create();
 	}
-	
+	public void recreate(){
+		currentState.create();
+	}
 	public GameState getCurrentState() {
 		return currentState;
 	}

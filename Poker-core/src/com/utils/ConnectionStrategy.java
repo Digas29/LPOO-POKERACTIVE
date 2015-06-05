@@ -11,7 +11,6 @@ public abstract class ConnectionStrategy {
 	public abstract void disconnect();
 	public void init(){
 		try {
-			WarpClient.setRecoveryAllowance(10);
 			WarpClient.initialize(ApiKey, SecretKey);
 			warpClient = WarpClient.getInstance();
 		} catch (Exception e) {

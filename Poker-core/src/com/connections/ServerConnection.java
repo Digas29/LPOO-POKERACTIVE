@@ -24,8 +24,7 @@ public class ServerConnection extends ConnectionStrategy {
 			@Override
 			public void onConnectDone(ConnectEvent arg0) {
 				if(arg0.getResult() == WarpResponseResultCode.SUCCESS){
-					System.out.println("connected");
-					warpClient.createRoom(room, "admin", 6, null);
+					warpClient.createTurnRoom(room, "admin", 6, null, 15);
 				}
 			}
 
@@ -45,7 +44,6 @@ public class ServerConnection extends ConnectionStrategy {
 			@Override
 			public void onCreateRoomDone(RoomEvent arg0) {
 				if(arg0.getResult() == WarpResponseResultCode.SUCCESS){
-					System.out.println("New Room created!!!");
 					data = arg0.getData();
 				}
 

@@ -2,6 +2,7 @@ package com.connections;
 
 import java.util.ArrayList;
 
+import com.badlogic.gdx.Gdx;
 import com.shephertz.app42.gaming.multiplayer.client.command.WarpResponseResultCode;
 import com.shephertz.app42.gaming.multiplayer.client.events.AllRoomsEvent;
 import com.shephertz.app42.gaming.multiplayer.client.events.AllUsersEvent;
@@ -15,19 +16,29 @@ import com.shephertz.app42.gaming.multiplayer.client.listener.ConnectionRequestL
 import com.shephertz.app42.gaming.multiplayer.client.listener.RoomRequestListener;
 import com.shephertz.app42.gaming.multiplayer.client.listener.ZoneRequestListener;
 import com.utils.ConnectionStrategy;
+import com.utils.StateMachine;
+import com.utils.StateMachine.States;
 
 public class ClientConnection extends ConnectionStrategy {
-	private ArrayList<RoomData> rooms = new ArrayList<RoomData>();
+	private static ArrayList<RoomData> rooms  = new ArrayList<RoomData>();
+	private static ArrayList<Integer> nrPlayers  = new ArrayList<Integer>();
+	
+	private int totalRooms;
 	@Override
 	public void connect(String name) {
+		totalRooms = 0;
 		init();
 		warpClient.addConnectionRequestListener(new ConnectionRequestListener(){
 
 			@Override
 			public void onConnectDone(ConnectEvent arg0) {
-				if(arg0.getResult() == WarpResponseResultCode.SUCCESS)
-					System.out.println("connected");
-				warpClient.getAllRooms();
+				if(arg0.getResult() == WarpResponseResultCode.SUCCESS){
+					warpClient.getAllRooms();
+				}
+				else{
+					System.exit(0);
+				}
+				
 			}
 
 			@Override
@@ -55,11 +66,14 @@ public class ClientConnection extends ConnectionStrategy {
 
 			@Override
 			public void onGetAllRoomsDone(AllRoomsEvent arg0) {
+				Gdx.app.log("pito", "my informative message");
 				String [] array = arg0.getRoomIds();
+				totalRooms = array.length;
 				for(int i = 0; i < array.length; i++){
+					Gdx.app.log("sala", "my informative message " + array[i]);
 					warpClient.getLiveRoomInfo(array[i]);
 				}
-				
+				Gdx.app.log("cona", "my informative message");
 			}
 
 			@Override
@@ -87,8 +101,18 @@ public class ClientConnection extends ConnectionStrategy {
 
 			@Override
 			public void onGetLiveRoomInfoDone(LiveRoomInfoEvent arg0) {
+				Gdx.app.log("c", "my informative message");
 				rooms.add(arg0.getData());
-				System.out.println(arg0.getData().getName());
+				if(arg0.getJoinedUsers() == null){
+					nrPlayers.add(0);
+				}
+				else{
+					nrPlayers.add(arg0.getJoinedUsers().length);
+				}
+				if(rooms.size() == totalRooms){
+					Gdx.app.log("cenas2000", "my informative message");
+					StateMachine.getStateMachine().switchState(States.CHOOSE_ROOM);
+				}
 			}
 
 			@Override
@@ -132,7 +156,6 @@ public class ClientConnection extends ConnectionStrategy {
 			}
 			
 		});
-		
 		warpClient.connectWithUserName(name);
 	}
 
@@ -140,5 +163,12 @@ public class ClientConnection extends ConnectionStrategy {
 	public void disconnect() {
 		
 	}
-
+	
+	public static ArrayList<RoomData> getRooms() {
+		return rooms;
+	}
+	
+	public static ArrayList<Integer> getNrPlayers() {
+		return nrPlayers;
+	}
 }

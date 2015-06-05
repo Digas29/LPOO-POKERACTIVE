@@ -1,6 +1,7 @@
 package com.states;
 
 
+import com.Poker.Poker;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
@@ -34,7 +35,6 @@ public class StrategyState implements GameState{
 		textureBackgroud = new Texture(Gdx.files.internal("img/strategy.png"));
 		atlas = new TextureAtlas(Gdx.files.internal("img/buttons.atlas"));
 		stage = new Stage();
-		create();
 	}
 	@Override
 	public void render() {
@@ -57,7 +57,7 @@ public class StrategyState implements GameState{
         
         skin = new Skin(atlas);
         table = new Table(skin);
-        table.setBounds(0, -Gdx.graphics.getHeight() * 0.05f, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        table.setBounds(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         
         TextButtonStyle style = new TextButtonStyle();
         style.font = font;
@@ -66,11 +66,13 @@ public class StrategyState implements GameState{
         style.down = skin.getDrawable("button_down");
         style.over = skin.getDrawable("button_down");
         
+        
         serverButton = new TextButton("MESA", style);
         serverButton.addListener(new ClickListener(){
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
 				super.clicked(event, x, y);
+				Poker.setServer(true);
 				StateMachine.getStateMachine().switchState(States.CHOOSE_NAME);
 			}
         	
@@ -80,11 +82,12 @@ public class StrategyState implements GameState{
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
 				super.clicked(event, x, y);
+				Poker.setServer(false);
 				StateMachine.getStateMachine().switchState(States.CHOOSE_NAME);
 			}
         	
         });
-        table.add(serverButton).row();
+        table.add(serverButton).padTop(Gdx.graphics.getHeight()*0.15f).row();
         table.getCell(serverButton).spaceBottom(75.0f);
         table.add(clientButton).row();
         stage.addActor(table);

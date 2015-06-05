@@ -1,17 +1,25 @@
 package com.states;
 
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField.TextFieldStyle;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
+import com.connections.ClientConnection;
 import com.utils.GameState;
 
 public class ChooseRoomState implements GameState {
@@ -21,26 +29,25 @@ public class ChooseRoomState implements GameState {
 	private Table rows;
 	private Table rowsHeaders;
 	private ScrollPane pane;
-//	private TextureAtlas atlas;
-//	private Skin skin;
-//	private BitmapFont fontBlack;
+	private TextureAtlas atlas;
+	private Skin skin;
+	private BitmapFont fontBlack;
 	private BitmapFont fontRed;
 	private TextField headerField;
 	private TextField nameColumn;
 	private TextField ocupationColumn;
 	
 	public ChooseRoomState(){
-		//atlas = new TextureAtlas(Gdx.files.internal("img/buttons.atlas"));
-		//skin = new Skin(atlas);
+		atlas = new TextureAtlas(Gdx.files.internal("img/table.atlas"));
+		skin = new Skin(atlas);
 		textureBackgroud = new Texture(Gdx.files.internal("img/strategy.png"));
 		stage = new Stage();
-		//fontBlack = new BitmapFont(Gdx.files.internal("fonts/trench.fnt"));
+		fontBlack = new BitmapFont(Gdx.files.internal("fonts/trench.fnt"));
 		fontRed = new BitmapFont(Gdx.files.internal("fonts/trench_red.fnt"));
-		create();
 	}
 	@Override
 	public void create() {
-Gdx.input.setInputProcessor(stage);
+		Gdx.input.setInputProcessor(stage);
 		
 		table = new Table();
 		rows = new Table();
@@ -60,26 +67,42 @@ Gdx.input.setInputProcessor(stage);
         styleLabel.font = fontRed;
         headerField = new TextField("Choose a room:", styleLabel);
         headerField.setAlignment(Align.center);
+        headerField.setDisabled(true);
         
         nameColumn = new TextField("Name", styleLabel);
         nameColumn.setAlignment(Align.center);
+        nameColumn.setDisabled(true);
         
         ocupationColumn = new TextField("Ocupation", styleLabel);
         ocupationColumn.setAlignment(Align.center);
-        
+        ocupationColumn.setDisabled(true);
         
         rowsHeaders.add(nameColumn).prefWidth(400);
         rowsHeaders.add(ocupationColumn).prefWidth(400);
+        TextButtonStyle styleLeft = new TextButtonStyle();
+        styleLeft.font =  fontBlack;
+        styleLeft.over = skin.getDrawable("table_down_left");
+        styleLeft.down = skin.getDrawable("table_down_left");
+        styleLeft.up = skin.getDrawable("table_down_left");
         
-        for(int i = 0; i < 50; i++){
-        	TextField a = new TextField("FEUP" + ((Integer)i).toString(), styleLabel);
-        	a.setDisabled(true);
-        	a.setAlignment(Align.center);
-        	TextField b = new TextField(((Integer)i).toString() + "/300", styleLabel);
-        	b.setDisabled(true);
-        	b.setAlignment(Align.center);
-        	rows.add(a).prefWidth(400);
-        	rows.add(b).prefWidth(400).row();
+        TextButtonStyle styleRight = new TextButtonStyle();
+        styleRight.font =  fontBlack;
+        styleRight.over = skin.getDrawable("table_down_right");
+        styleRight.down = skin.getDrawable("table_down_right");
+        styleRight.up = skin.getDrawable("table_down_right");
+        for(int i = 0; i < ClientConnection.getRooms().size(); i++){
+        	TextButton a = new TextButton(ClientConnection.getRooms().get(i).getName(), styleLeft);
+        	TextButton b = new TextButton(ClientConnection.getNrPlayers().get(i) + "/" + ClientConnection.getRooms().get(i).getMaxUsers(), styleRight);
+        	a.addCaptureListener(new ClickListener(){
+
+				@Override
+				public void clicked(InputEvent event, float x, float y) {
+					super.clicked(event, x, y);
+				}
+        		
+        	});
+        	rows.add(a).prefWidth(400).spaceBottom(5.0f);
+        	rows.add(b).prefWidth(400).spaceBottom(5.0f).row();
         }
         
         

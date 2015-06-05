@@ -6,8 +6,16 @@ import com.badlogic.gdx.graphics.GL20;
 import com.utils.StateMachine;
 
 public class Poker implements ApplicationListener{ 
-    
-    @Override
+    private static boolean server = false;
+    public static boolean isServer() {
+		return server;
+	}
+
+	public static void setServer(boolean server) {
+		Poker.server = server;
+	}
+
+	@Override
     public void create() {
     }
 
