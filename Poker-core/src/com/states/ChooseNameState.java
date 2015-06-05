@@ -26,6 +26,8 @@ import com.connections.ClientConnection;
 import com.connections.ServerConnection;
 import com.utils.ConnectionStrategy;
 import com.utils.GameState;
+import com.utils.StateMachine;
+import com.utils.StateMachine.States;
 
 public class ChooseNameState implements GameState {
 	
@@ -107,6 +109,7 @@ public class ChooseNameState implements GameState {
 					else{
 						connection = new ClientConnection();						
 					}
+					StateMachine.getStateMachine().switchState(States.LOADING);
 					connection.connect(textField.getText());
 					return true;
 				}
@@ -139,6 +142,10 @@ public class ChooseNameState implements GameState {
 	@Override
 	public void dispose() {
 
+	}
+	@Override
+	public void resize(int x, int y) {
+		stage.getViewport().update(x, y, true);	
 	}
 
 }

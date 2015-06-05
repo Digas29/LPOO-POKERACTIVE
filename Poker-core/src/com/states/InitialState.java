@@ -62,4 +62,9 @@ public class InitialState implements GameState{
 		
 	}
 
+	@Override
+	public void resize(int x, int y) {
+		stage.getViewport().update(x, y, true);
+	}
+
 }

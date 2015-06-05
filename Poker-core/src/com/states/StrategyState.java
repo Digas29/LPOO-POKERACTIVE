@@ -87,11 +87,16 @@ public class StrategyState implements GameState{
 			}
         	
         });
-        table.add(serverButton).padTop(Gdx.graphics.getHeight()*0.15f).row();
+        table.add(serverButton).padTop(Gdx.graphics.getHeight()*0.15f).center().row();
         table.getCell(serverButton).spaceBottom(75.0f);
-        table.add(clientButton).row();
+        table.add(clientButton).center().row();
         stage.addActor(table);
 		
+	}
+	
+	@Override
+	public void resize(int x, int y) {
+		stage.getViewport().update(x, y, true);
 	}
 
 }

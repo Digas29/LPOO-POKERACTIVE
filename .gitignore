@@ -4,3 +4,6 @@
 .Poker-android/.classpath
 .Poker-desktop/.classpath
 .Poker-core/.classpath
+Poker-android/bin/
+Poker-desktop/bin/
+Poker-core/bin

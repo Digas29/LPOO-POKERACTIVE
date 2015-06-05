@@ -123,5 +123,9 @@ public class ChooseRoomState implements GameState {
 	public void dispose() {
 
 	}
+	@Override
+	public void resize(int x, int y) {
+		stage.getViewport().update(x, y, true);
+	}
 
 }

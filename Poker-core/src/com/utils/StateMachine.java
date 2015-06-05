@@ -1,8 +1,10 @@
 package com.utils;
 
+import com.badlogic.gdx.Gdx;
 import com.states.ChooseNameState;
 import com.states.ChooseRoomState;
 import com.states.InitialState;
+import com.states.LoadingState;
 import com.states.StrategyState;
 
 
@@ -14,7 +16,8 @@ public class StateMachine {
 		CHOOSE_ROOM,
 		CHOOSE_NAME,
 		INITIAL,
-		STRATEGY
+		STRATEGY,
+		LOADING
 	}
 	
 	private GameState currentState;
@@ -22,10 +25,12 @@ public class StateMachine {
 	private StrategyState strategy = new StrategyState();
 	private ChooseNameState chooseName = new ChooseNameState();
 	private ChooseRoomState chooseRoom = new ChooseRoomState();
+	private LoadingState loading = new LoadingState();
 	private static StateMachine machine = null;
 	
 	protected StateMachine(){
 		currentState = initial;
+		currentState.resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 	}
 	
 	public static StateMachine getStateMachine(){
@@ -49,6 +54,9 @@ public class StateMachine {
 			break;
 		case CHOOSE_NAME:
 			currentState = chooseName;
+			break;
+		case LOADING:
+			currentState = loading;
 			break;
 		default:
 			break;

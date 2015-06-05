@@ -33,6 +33,7 @@ public class Poker implements ApplicationListener{
 
     @Override
     public void resize(int width, int height) {
+    	StateMachine.getStateMachine().getCurrentState().resize(width, height);
     }
 
     @Override
