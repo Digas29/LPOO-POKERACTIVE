@@ -14,7 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField.TextFieldStyle;
 import com.badlogic.gdx.utils.Align;
-import com.badlogic.gdx.utils.viewport.StretchViewport;
+import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.utils.GameState;
 
 public class LoadingState implements GameState {
@@ -26,7 +26,7 @@ public class LoadingState implements GameState {
 	private BitmapFont fontRed;
 	
 	public LoadingState(){
-		stage = new Stage(new StretchViewport(1920, 1080));
+		stage = new Stage(new FitViewport(1920, 1080));
 		textureChip = new Texture(Gdx.files.internal("img/chipRed.png"));
 		fontRed = new BitmapFont(Gdx.files.internal("fonts/trench_red.fnt"));
 	}
@@ -40,7 +40,7 @@ public class LoadingState implements GameState {
 		TextureRegion region = new TextureRegion(textureChip, 0, 0, textureChip.getWidth(), textureChip.getHeight());          
 		Image chip = new Image(region);
 		chip.setOrigin(textureChip.getWidth()/2, textureChip.getHeight()/2);
-		chip.setPosition(Gdx.graphics.getWidth()/2 - textureChip.getWidth()/2, Gdx.graphics.getHeight()/2 - textureChip.getHeight()/2);
+		chip.setPosition(stage.getWidth()/2 - textureChip.getWidth()/2, stage.getHeight()/2 - textureChip.getHeight()/2);
 		chip.addAction(Actions.forever(Actions.rotateBy(2.5f)));
 		stage.addActor(chip);
 		TextFieldStyle styleLabel = new TextFieldStyle();
@@ -52,7 +52,7 @@ public class LoadingState implements GameState {
         
         table.addAction(Actions.forever(Actions.sequence(Actions.fadeOut(1.0f), Actions.fadeIn(1.0f))));
         
-        table.add(textField).padTop(Gdx.graphics.getHeight() * 0.9f).prefWidth(800).row();
+        table.add(textField).padTop(stage.getHeight() * 0.9f).prefWidth(800).row();
         
         stage.addActor(table);
 		

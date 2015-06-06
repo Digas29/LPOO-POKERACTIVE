@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.utils.GameState;
 import com.utils.StateMachine;
@@ -17,10 +18,11 @@ public class InitialState implements GameState{
 	private Stage stage;
 	
 	public InitialState(){
-		stage = new Stage(new StretchViewport(1920, 1080));
+		stage = new Stage(new FitViewport(1920, 1080));
 		cards = Gdx.audio.newSound(Gdx.files.internal("snd/cardShuffle.wav"));
 		texture = new Texture(Gdx.files.internal("img/present.png"));
 	}
+	
 
 	@Override
 	public void render() {

@@ -19,7 +19,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField.TextFieldStyle;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
-import com.badlogic.gdx.utils.viewport.StretchViewport;
+import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.connections.ClientConnection;
 import com.utils.GameState;
 
@@ -42,7 +42,7 @@ public class ChooseRoomState implements GameState {
 		atlas = new TextureAtlas(Gdx.files.internal("img/table.atlas"));
 		skin = new Skin(atlas);
 		textureBackgroud = new Texture(Gdx.files.internal("img/strategy.png"));
-		stage = new Stage(new StretchViewport(1920, 1080));
+		stage = new Stage(new FitViewport(1920, 1080));
 		fontBlack = new BitmapFont(Gdx.files.internal("fonts/trench.fnt"));
 		fontRed = new BitmapFont(Gdx.files.internal("fonts/trench_red.fnt"));
 	}

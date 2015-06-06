@@ -22,7 +22,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField.OnscreenKeyboard;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField.TextFieldStyle;
 import com.badlogic.gdx.utils.Align;
-import com.badlogic.gdx.utils.viewport.StretchViewport;
+import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.connections.ClientConnection;
 import com.connections.ServerConnection;
 import com.utils.ConnectionStrategy;
@@ -46,7 +46,7 @@ public class ChooseNameState implements GameState {
 	
 	public ChooseNameState(){
 		keyboardOnScreen = false;
-		stage = new Stage(new StretchViewport(1920, 1080));
+		stage = new Stage(new FitViewport(1920, 1080));
 		atlas = new TextureAtlas(Gdx.files.internal("img/buttons.atlas"));
 		skin = new Skin(atlas);
 		textureBackgroud = new Texture(Gdx.files.internal("img/strategy.png"));
@@ -57,14 +57,10 @@ public class ChooseNameState implements GameState {
 	public void create() {
 		Gdx.input.setInputProcessor(stage);
 		
-		cam = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-        cam.position.set(Gdx.graphics.getWidth()/2f, Gdx.graphics.getHeight()/2f, 0);
-        cam.update();
-        stage.getViewport().setCamera(cam);
-        
 		table = new Table();
         
 		table.setBounds(0, 0, stage.getWidth(), stage.getHeight());
+		
 		TextureRegion region = new TextureRegion(textureBackgroud, 0, 0, textureBackgroud.getWidth(), textureBackgroud.getHeight());          
         Image background = new Image(region);
         stage.addActor(background);
