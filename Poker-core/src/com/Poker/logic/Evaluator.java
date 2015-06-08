@@ -2,11 +2,30 @@ package com.Poker.logic;
 
 import java.util.ArrayList;
 
+/**
+ * 
+ * Class that defines the hand evaluator.
+ * 
+ * @author Diogo Trindade
+ * @author Rui Vilares
+ * 
+ */
+
 public class Evaluator {
+	/** Array with every cards(board+hand) */
 	private Card[] cards;
+	/** Auxiliary array */
 	private int[] value;
 	
-	
+	/**
+	 * Constructs and initializes a hand evaluator.
+	 * 
+	 * @param arrayList 
+	 * 			ArrayList with every player cards.
+	 * @param board 
+	 * 			Array with every board cards.
+	 * 
+	 */
 	public Evaluator(ArrayList<Card> arrayList, Card[] board)
     {
         value = new int[6];
@@ -19,7 +38,10 @@ public class Evaluator {
         }
         rank();
     }
-
+	
+	/**
+	 * Auxiliary function that determines the type of hand that player had.
+	 */
 	private void rank() {
 		int[] ranks = new int[13];
 		int[] suits = new int[4];
@@ -176,7 +198,14 @@ public class Evaluator {
             value[1]=orderedRanks[0];
         }
 	}
-
+	
+	
+	/**
+	 * Draws hand information to String.
+	 * 
+	 * @return String with hand information
+	 * 
+	 */
 	public String toString() {
 		String s;
 		switch (value[0]) {
@@ -216,7 +245,17 @@ public class Evaluator {
 		s = "                " + s;
 		return s;
 	}
-
+	
+	
+	/**
+	 * Compare hand with another hand.
+	 * 
+	 * @param ev 
+	 * 			Evaluator to compare
+	 * 
+	 * @return int with the result
+	 * 
+	 */
 	public int compareTo(Evaluator ev) {
 		if(ev == null)
 			return 1;
@@ -229,6 +268,13 @@ public class Evaluator {
 		return 0; // if hands are equal
 	}
 	
+	
+	/**
+	 * Get type of hand.
+	 * 
+	 * @return int with the type of hand
+	 * 
+	 */
 	public int getValue(){
 		return value[0];
 	}

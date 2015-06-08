@@ -72,6 +72,7 @@ public class ClientConnection extends ConnectionStrategy {
 
 			@Override
 			public void onGetAllRoomsDone(AllRoomsEvent arg0) {
+				rooms.clear();
 				String [] array = arg0.getRoomIds();
 				if(array != null){
 					totalRooms = array.length;

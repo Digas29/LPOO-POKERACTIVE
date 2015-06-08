@@ -93,39 +93,41 @@ public class ChooseRoomState implements GameState {
 
         
         for(int i = 0; i < ClientConnection.getRooms().size(); i++){
-        	TextButton left = new TextButton(ClientConnection.getRooms().get(i).getName(), styleLeft);
-        	TextButton right = new TextButton((ClientConnection.getNrPlayers().get(i).intValue() - 1) + "/" + (ClientConnection.getRooms().get(i).getMaxUsers() - 1), styleRight);
-        	final String id = ClientConnection.getRooms().get(i).getId();
-        	left.addCaptureListener(new ClickListener(){
+        	if(ClientConnection.getNrPlayers().get(i).intValue() - 1 >=0){
+        		TextButton left = new TextButton(ClientConnection.getRooms().get(i).getName(), styleLeft);
+        		TextButton right = new TextButton((ClientConnection.getNrPlayers().get(i).intValue() - 1) + "/" + (ClientConnection.getRooms().get(i).getMaxUsers() - 1), styleRight);
+        		final String id = ClientConnection.getRooms().get(i).getId();
+        		left.addCaptureListener(new ClickListener(){
 
-				@Override
-				public void clicked(InputEvent event, float x, float y) {
-					try {
-						WarpClient.getInstance().joinRoom(id);
-						StateMachine.getStateMachine().switchState(States.LOADING);
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-					super.clicked(event, x, y);
-				}
-        		
-        	});
-        	right.addCaptureListener(new ClickListener(){
+        			@Override
+        			public void clicked(InputEvent event, float x, float y) {
+        				try {
+        					WarpClient.getInstance().joinRoom(id);
+        					StateMachine.getStateMachine().switchState(States.LOADING);
+        				} catch (Exception e) {
+        					e.printStackTrace();
+        				}
+        				super.clicked(event, x, y);
+        			}
+        		});
+        	
+        		right.addCaptureListener(new ClickListener(){
 
-				@Override
-				public void clicked(InputEvent event, float x, float y) {
-					try {
-						WarpClient.getInstance().joinRoom(id);
-						StateMachine.getStateMachine().switchState(States.LOADING);
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-					super.clicked(event, x, y);
-				}
-        		
-        	});
-        	rows.add(left).prefWidth(400).spaceBottom(5.0f);
-        	rows.add(right).prefWidth(400).spaceBottom(5.0f).row();
+        			@Override
+        			public void clicked(InputEvent event, float x, float y) {
+        				try {
+        					WarpClient.getInstance().joinRoom(id);
+        					StateMachine.getStateMachine().switchState(States.LOADING);
+        				} catch (Exception e) {
+        					e.printStackTrace();
+        				}
+        				super.clicked(event, x, y);
+        			}
+
+        		});
+        		rows.add(left).prefWidth(400).spaceBottom(5.0f);
+        		rows.add(right).prefWidth(400).spaceBottom(5.0f).row();
+        	}
         }
         
         

@@ -50,7 +50,7 @@ public class PlayerState implements GameState {
 	private Player player;
 	//private final int waitResponce = 15;
 	private String serverName = null;
-	private Skin skinButtons;
+	private static Skin skinButtons = null;
 	private BitmapFont font;
 	private TextureAtlas atlasButtons;
 	private TextureAtlas atlasCards;
@@ -389,5 +389,9 @@ public class PlayerState implements GameState {
 	}
 	public static String cardFileName(Card card){
 		return Card.rankAsString(card.getRank()) + "_of_" + Card.suitAsString(card.getSuit());
+	}
+	
+	public static Skin getSkinButtons() {
+		return skinButtons;
 	}
 }

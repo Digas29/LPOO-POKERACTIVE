@@ -7,17 +7,37 @@ import com.Poker.events.GameEvent;
 import com.Poker.events.GameListener;
 import com.Poker.logic.Player.Action;
 
+/**
+ * 
+ * Class that defines the Round.
+ * 
+ * @author Diogo Trindade
+ * @author Rui Vilares
+ * 
+ */
 
 public class PokerGame {
+	/** ArrayList with every rounds */
 	private ArrayList<Round> rounds;
+	/** ArrayList with every players */
 	private ArrayList<Player> players;
+	/** ArrayList with winners */
 	private ArrayList<Player> winners;
+	/** LinkedList with every players, like a queue */
 	private LinkedList<Player> playersQueue;
+	/** GameListener */
 	private GameListener listener = null;
+	/** Number of iteration */
 	private int gameIteration;
+	/** Actual maxBet */
 	private int maxBet;
+	/** pot amount */
 	private int pot;
 	
+	/**
+	 * Constructs and initializes a Poker game.
+	 * 
+	 */
 	public PokerGame() {
 		gameIteration = 0;
 		pot  = 0;
@@ -27,18 +47,46 @@ public class PokerGame {
 		rounds = new ArrayList<Round>();
 		playersQueue = new LinkedList<Player>();	
 	}
+	
+	/**
+	 * Add Game Listener to listener
+	 * 
+	 * @param listener
+	 * 					specific listener
+	 * 
+	 */
 	public void addGameListener(GameListener listener){
 		this.listener = listener;
 	}
 	
+	
+	/**
+	 * Get players 
+	 * 
+	 * @return ArrayList with players
+	 * 
+	 */
 	public ArrayList<Player> getPlayers(){
 		return players;
 	}
 	
+	/**
+	 * Get rounds 
+	 * 
+	 * @return ArrayList with rounds
+	 * 
+	 */
 	public ArrayList<Round> getRounds(){
 		return rounds;
 	}
 	
+	/**
+	 * Add a new round
+	 * 
+	 * @param waitingList
+	 * 					 players in game
+	 * 
+	 */
 	public void addRound(ArrayList<Player> waitingList){
 		for(Player x: waitingList){
 			players.add(x);
@@ -54,6 +102,19 @@ public class PokerGame {
 		rounds.add(new Round(players));
 	}
 	
+	/**
+	 * Action chosen by the player
+	 * 
+	 * @param action
+	 * 					action chosen
+	 * @param player
+	 * 					specific player
+	 * @param raiseAmount
+	 * 					raise amount
+	 * 
+	 * @return true if was possible, false otherwise
+	 * 
+	 */
 	public boolean playerAction(Action action, Player player, int raiseAmount){
 
 		int amount = player.update(action, maxBet, raiseAmount);
@@ -69,6 +130,14 @@ public class PokerGame {
 			return true;
 		}
 	}
+	
+	/**
+	 * Refresh the players queue
+	 * 
+	 * @param player
+	 * 					specific player
+	 * 
+	 */
 	private void refreshQueue(Player player) {
 		playersQueue.clear();
 		int index = players.indexOf(player);
@@ -90,6 +159,10 @@ public class PokerGame {
 			
 	}
 	
+	/**
+	 * Go to a new iteration
+	 * 
+	 */
 	public void nextStage(){
 		gameIteration++;
 		for(Player x: players){
@@ -124,6 +197,12 @@ public class PokerGame {
 		listener.gameEvent(new GameEvent("NEXT TURN",0));
 	}
 
+	/**
+	 * Get number of players for a new action
+	 * 
+	 *  @return total 
+	 * 
+	 */
 	public int nrPlayersForAction(){
 		int total = 0;
 		for(Player p: players){
@@ -133,6 +212,12 @@ public class PokerGame {
 		return total;
 	}
 	
+	/**
+	 * Get number of players in game
+	 * 
+	 *  @return total 
+	 * 
+	 */
 	public int nrPlayersInGame(){
 		int total = 0;
 		for(Player p: players){
@@ -142,6 +227,11 @@ public class PokerGame {
 		return total;
 	}
 	
+	
+	/**
+	 * Prepare players queue
+	 * 
+	 */
 	public void prepareQueue(){
 		for(Player p: players){
 			if(p.inGame() && !p.isAllIn())
@@ -149,24 +239,49 @@ public class PokerGame {
 		}
 	}
 	
+	
+	/**
+	 * Get next player 
+	 * 
+	 * @return next player
+	 */
 	public Player getNextPlayer(){
 		return playersQueue.poll();
 	}
 
-
+	/**
+	 * Get Max Bet
+	 * 
+	 * @return max bet
+	 */
 	public int getMaxBet() {
 		return maxBet;
 	}
 
-
+	/**
+	 * Get ArrayList with winners
+	 * 
+	 * @return winners
+	 */
+	
 	public ArrayList<Player> getWinners() {
 		return winners;
 	}
 
-
+	/**
+	 * Get pot amount
+	 * 
+	 * @return pot
+	 */
 	public int getPot() {
 		return pot;
 	}
+	
+	/**
+	 * Get actual game iteration
+	 * 
+	 * @return iteration
+	 */
 	public int getGameIteration() {
 		return gameIteration;
 	}

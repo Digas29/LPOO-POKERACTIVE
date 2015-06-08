@@ -196,7 +196,7 @@ public class BoardState implements GameState{
 						else{
 							game.playerAction(Action.RAISE, y, Integer.parseInt(arg1.substring("RAISE ".length(), arg1.length())));
 						}
-						
+						textFields.get(game.getPlayers().indexOf(y)).setText(y.getName() + "\n" + "$" + y.getMoney());
 						Player x = game.getNextPlayer();
 						if(game.nrPlayersForAction() <= 1){
 							while(game.getGameIteration() < 4){
