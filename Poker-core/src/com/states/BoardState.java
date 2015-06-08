@@ -12,6 +12,16 @@ import com.Poker.logic.Player.Action;
 import com.Poker.logic.PokerGame;
 import com.Poker.events.GameEvent;
 import com.Poker.events.GameListener;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.TextField;
+import com.badlogic.gdx.scenes.scene2d.ui.TextField.TextFieldStyle;
+import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.connections.ServerConnection;
 import com.shephertz.app42.gaming.multiplayer.client.events.ChatEvent;
 import com.shephertz.app42.gaming.multiplayer.client.events.LobbyData;
@@ -27,9 +37,19 @@ public class BoardState implements GameState{
 	private final int money = 1000;
 	private boolean inGame;
 	private ArrayList<Player> waitingList;
-
+	private Texture background;
+	private TextureAtlas circles;
+	private ArrayList<TextField> textFields;
+	private TextFieldStyle style;
+	private Table table;
+	private Stage stage;
 	
 	public BoardState(){
+		textFields = new ArrayList<TextField>();
+		background = new Texture(Gdx.files.internal("img/board.png"));
+		circles = new TextureAtlas(Gdx.files.internal("img/cirlces.atlas"));
+		stage = new Stage(new FitViewport(1920,1080));
+		table = new Table();
 		game = new PokerGame();
 		game.addGameListener(new GameListener(){
 
@@ -222,6 +242,14 @@ public class BoardState implements GameState{
 			}
 
 		});
+		table.setBounds(0, 0, stage.getWidth(), stage.getWidth());
+		
+		TextureRegion region = new TextureRegion(background, 0, 0, background.getWidth(), background.getHeight());
+		Image img = new Image(region);
+		img.moveBy((stage.getWidth() - img.getWidth())/2.0f, (stage.getHeight() - img.getHeight())/2.0f);
+		table.addActor(img);
+		
+		stage.addActor(table);
 	}
 	
 	private void startAction() {
@@ -232,7 +260,8 @@ public class BoardState implements GameState{
 	
 	@Override
 	public void render() {
-
+		stage.act();
+		stage.draw();
 	}
 
 	@Override

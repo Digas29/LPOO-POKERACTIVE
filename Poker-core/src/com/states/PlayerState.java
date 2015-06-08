@@ -48,7 +48,7 @@ public class PlayerState implements GameState {
 	private Image cardBackRight;
 	private TextButtonStyle style;
 	private Player player;
-	private final int waitResponce = 15;
+	//private final int waitResponce = 15;
 	private String serverName = null;
 	private Skin skinButtons;
 	private BitmapFont font;
