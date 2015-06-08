@@ -1,5 +1,9 @@
 package com.states;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutput;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -42,7 +46,7 @@ public class BoardState implements GameState{
 					ServerConnection.getWarpClient().sendChat("END");
 					winners.clear();
 					try {
-						Thread.sleep(5000);
+						Thread.sleep(15000);
 					} catch (InterruptedException e1) {
 						e1.printStackTrace();
 					}
@@ -50,6 +54,7 @@ public class BoardState implements GameState{
 						inGame = true;
 						game.addRound(waitingList);
 						waitingList.clear();
+						sendCards();
 						startAction();
 					}
 				}
@@ -60,10 +65,42 @@ public class BoardState implements GameState{
 					ServerConnection.getWarpClient().sendPrivateChat(current.getName(), message);
 				}
 			}
+
 			
 		});
 		inGame = false;
 		waitingList = new ArrayList<Player>();
+	}
+	private void sendCards() {
+
+		ArrayList<Player> players = game.getPlayers();
+		for(int j = 0; j < 2; j++){
+			for(Player x: players){
+				ByteArrayOutputStream bos = new ByteArrayOutputStream();
+				ObjectOutput out = null;
+				try {
+					out = new ObjectOutputStream(bos);
+					out.writeObject(x.getCards().get(j));
+					byte[] yourBytes = bos.toByteArray();
+					ServerConnection.getWarpClient().sendPrivateUpdate(x.getName(), yourBytes);
+	
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				finally {
+					try {
+						if (out != null) {
+							out.close();
+						}
+					} catch (IOException ex) {
+					}
+					try {
+						bos.close();
+					} catch (IOException ex) {
+					}
+				}
+			}	
+		}
 	}
 	
 	@Override
@@ -163,6 +200,7 @@ public class BoardState implements GameState{
 					inGame = true;
 					game.addRound(waitingList);
 					waitingList.clear();
+					sendCards();
 					startAction();
 				}
 			}

@@ -59,11 +59,11 @@ public class PlayerState implements GameState {
 	private TextButton raiseButton;
 	private TextButton showCards;
 	private int maxBet;
-	private Timer timer;
+	//private Timer timer;
 	private Table table2;
 	
 	public PlayerState(){
-		timer = new Timer();
+		//timer = new Timer();
 		maxBet = 0;
 		font = new BitmapFont(Gdx.files.internal("fonts/trench.fnt"));
 		tableL = new Table();
@@ -259,6 +259,8 @@ public class PlayerState implements GameState {
 					tableR.clear();
 					Image img1 = new Image(atlasCards.findRegion(cardFileName(player.getCards().get(0))));
 					Image img2 = new Image(atlasCards.findRegion(cardFileName(player.getCards().get(1))));
+					img1.moveBy(104.0f, -5.0f);
+					img2.moveBy(104.0f, -5.0f);
 					tableL.addActor(img1);
 					tableR.addActor(img2);
 				}
@@ -276,7 +278,7 @@ public class PlayerState implements GameState {
 				super.clicked(event, x, y);
 				if(!foldButton.isDisabled()){
 					if(player.update(Action.FOLD, maxBet, 0) >= 0){
-						timer.cancel();
+						//timer.cancel();
 						foldButton.setDisabled(true);
 						callButton.setDisabled(true);
 						raiseButton.setDisabled(true);
@@ -297,7 +299,7 @@ public class PlayerState implements GameState {
 				super.clicked(event, x, y);
 				if(!callButton.isDisabled()){
 					if(player.update(Action.CALL, maxBet, 0) >= 0){
-						timer.cancel();
+						//timer.cancel();
 						foldButton.setDisabled(true);
 						callButton.setDisabled(true);
 						raiseButton.setDisabled(true);
@@ -318,7 +320,7 @@ public class PlayerState implements GameState {
 				super.clicked(event, x, y);
 				if(!raiseButton.isDisabled()){
 					if(player.update(Action.RAISE, maxBet, 100) >= 0){
-						timer.cancel();
+						//timer.cancel();
 						foldButton.setDisabled(true);
 						callButton.setDisabled(true);
 						raiseButton.setDisabled(true);
@@ -375,7 +377,7 @@ public class PlayerState implements GameState {
 		foldButton.setDisabled(false);
 		callButton.setDisabled(false);
 		raiseButton.setDisabled(false);
-		timer.schedule(new TimerTask(){
+		/*timer.schedule(new TimerTask(){
 			
 			@Override
 			public void run() {
@@ -383,7 +385,7 @@ public class PlayerState implements GameState {
 				ClientConnection.getWarpClient().sendPrivateChat(serverName, Action.FOLD.toString());
 			}
 			
-		}, waitResponce*1000);
+		}, waitResponce*1000);*/
 	}
 	public static String cardFileName(Card card){
 		return Card.rankAsString(card.getRank()) + "_of_" + Card.suitAsString(card.getSuit());
