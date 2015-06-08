@@ -40,6 +40,7 @@ import com.utils.GameState;
 public class PlayerState implements GameState {
 
 	private Texture cardsBackTexture;
+	private Texture cardsTexture;
 	private Stage stage;
 	private Table tableL;
 	private Table tableR;
@@ -50,14 +51,18 @@ public class PlayerState implements GameState {
 	private Player player;
 	private final int waitResponce = 15;
 	private String serverName = null;
-	private Skin skin;
+	private Skin skinButtons;
+	private Skin skinCards;
 	private BitmapFont font;
-	private TextureAtlas atlas;
+	private TextureAtlas atlasButtons;
+	private TextureAtlas atlasCards;
 	private TextButton foldButton;
 	private TextButton callButton;
 	private TextButton raiseButton;
+	private TextButton showCards;
 	private int maxBet;
 	private Timer timer;
+	private Table table2;
 	
 	public PlayerState(){
 		timer = new Timer();
@@ -66,17 +71,20 @@ public class PlayerState implements GameState {
 		tableL = new Table();
 		tableR = new Table();
 		table = new Table();
+		table2 = new Table();
 		stage = new Stage(new FitViewport(1920,1080));
 		cardsBackTexture = new Texture(Gdx.files.internal("img/Card_back.png"));
-		atlas = new TextureAtlas(Gdx.files.internal("img/action_buttons.atlas"));
-		skin = new Skin(atlas);
+		atlasButtons = new TextureAtlas(Gdx.files.internal("img/action_buttons.atlas"));
+		atlasCards = new TextureAtlas(Gdx.files.internal("img/cards.txt"));
+		skinButtons = new Skin(atlasButtons);
+		skinCards = new Skin(atlasCards);
 		style = new TextButtonStyle();
         style.font = font;
         style.fontColor = Color.BLACK;
-        style.up = skin.getDrawable("action_up");
-        style.down = skin.getDrawable("action_over");
-        style.over = skin.getDrawable("action_over");
-        style.disabled = skin.getDrawable("action_disable");
+        style.up = skinButtons.getDrawable("action_up");
+        style.down = skinButtons.getDrawable("action_over");
+        style.over = skinButtons.getDrawable("action_over");
+        style.disabled = skinButtons.getDrawable("action_disable");
 	}
 	@Override
 	public void create() {
@@ -141,8 +149,7 @@ public class PlayerState implements GameState {
 				ObjectInput in = null;
 				try {
 					in = new ObjectInputStream(bis);
-					Object o = in.readObject();
-					Card card = (Card)o;
+					Card card =(Card) in.readObject();
 					player.addCard(card);
 					cardRecived();
 				} 
@@ -233,6 +240,36 @@ public class PlayerState implements GameState {
 		tableL.addActor(cardBackLeft);
 		tableR.addActor(cardBackRight);
 		
+		showCards = new TextButton("SHOW CARDS",style);
+		showCards.setDisabled(true);
+		showCards.addListener(new ClickListener(){
+
+			@Override
+			public void touchUp(InputEvent event, float x, float y,
+					int pointer, int button) {
+				super.touchUp(event, x, y, pointer, button);
+				tableL.clear();
+				tableR.clear();
+				tableL.addActor(cardBackLeft);
+				tableR.addActor(cardBackRight);
+			}
+
+			@Override
+			public boolean touchDown(InputEvent event, float x, float y,
+					int pointer, int button) {
+				if(!showCards.isDisabled()){
+					tableL.clear();
+					tableR.clear();
+					Image img1 = new Image(atlasCards.findRegion(cardFileName(player.getCards().get(0))));
+					Image img2 = new Image(atlasCards.findRegion(cardFileName(player.getCards().get(1))));
+					tableL.addActor(img1);
+					tableR.addActor(img2);
+				}
+				return super.touchDown(event, x, y, pointer, button);
+			}
+			
+			
+		});
 		foldButton = new TextButton("FOLD",style);
 		foldButton.setDisabled(true);
 		foldButton.addListener(new ClickListener(){
@@ -294,13 +331,15 @@ public class PlayerState implements GameState {
 			}
 			
 		});
-		
-		table.add(foldButton).spaceRight(10.0f).prefWidth(300.0f).padTop(0.9f*stage.getHeight());
-		table.add(callButton).spaceRight(10.0f).prefWidth(300.0f).padTop(0.9f*stage.getHeight());
-		table.add(raiseButton).prefWidth(300.0f).padTop(0.9f*stage.getHeight());
+		table2.setBounds(0,0, stage.getWidth(),stage.getHeight());
+		table2.add(showCards).prefWidth(300.0f).padBottom(0.9f*stage.getHeight());
+		table.add(foldButton).spaceLeft(25.0f).spaceRight(25.0f).prefWidth(300.0f).padTop(0.9f*stage.getHeight());
+		table.add(callButton).spaceLeft(25.0f).spaceRight(25.0f).prefWidth(300.0f).padTop(0.9f*stage.getHeight());
+		table.add(raiseButton).spaceLeft(25.0f).spaceRight(25.0f).prefWidth(300.0f).padTop(0.9f*stage.getHeight());
 		
 		stage.addActor(tableL);
 		stage.addActor(tableR);
+		stage.addActor(table2);
 		stage.addActor(table);
 	}
 
@@ -323,13 +362,16 @@ public class PlayerState implements GameState {
 	public void cardRecived(){
 		if(player.getCards().size() == 1)
 			cardBackLeft.addAction(Actions.moveBy(0, -stage.getHeight(), 1.5f));
-		else
+		else{
 			cardBackRight.addAction(Actions.moveBy(0, -stage.getHeight(), 1.5f));
+			showCards.setDisabled(false);
+		}
 	}
 	
 	public void moveUpCards(){
 		cardBackLeft.addAction(Actions.moveBy(0, stage.getHeight(), 1.0f));
 		cardBackRight.addAction(Actions.moveBy(0, stage.getHeight(), 1.0f));
+		showCards.setDisabled(true);
 	}
 	private void chooseAction() {
 		Gdx.input.vibrate(1000);
@@ -346,5 +388,7 @@ public class PlayerState implements GameState {
 			
 		}, waitResponce*1000);
 	}
-
+	public static String cardFileName(Card card){
+		return Card.rankAsString(card.getRank()) + "_of_" + Card.suitAsString(card.getSuit());
+	}
 }

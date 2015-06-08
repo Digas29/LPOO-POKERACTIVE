@@ -108,13 +108,13 @@ public class BoardState implements GameState{
 						}
 						
 						Player x = game.getNextPlayer();
+						if(game.nrPlayersForAction() <= 1){
+							while(game.getGameIteration() < 4){
+								game.nextStage();
+							}
+						}
 						if(x == null){
 							game.nextStage();
-							if(game.nrPlayersForAction() <= 1){
-								while(game.getGameIteration() < 4){
-									game.nextStage();
-								}
-							}
 						}
 						else{
 							String message = "MAX BET: " + game.getMaxBet();

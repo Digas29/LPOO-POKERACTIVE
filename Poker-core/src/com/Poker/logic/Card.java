@@ -9,9 +9,9 @@ public class Card implements Serializable{
 	private int rank;
     private int suit;
 
-    private static String[] suits = { "Hearts", "Spades", "Diamonds", "Clubs"};
-    private static String[] ranks  = { "Ace", "2", "3", "4", "5", "6", "7", 
-                   "8", "9", "10", "Jack", "Queen", "King" };
+    private static String[] suits = { "hearts", "spades", "diamonds", "clubs"};
+    private static String[] ranks  = { "ace", "2", "3", "4", "5", "6", "7", 
+                   "8", "9", "10", "jack", "queen", "king" };
 
     public static String rankAsString(int rank)
     {
@@ -30,7 +30,6 @@ public class Card implements Serializable{
     }
     
     
-    // Alterar se necessário
     public @Override String toString()
     {
           return ranks[rank] + " of " + suits[suit];
