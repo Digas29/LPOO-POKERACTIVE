@@ -18,28 +18,30 @@ public class Round {
 		ObjectOutput out = null;
 		this.players = p;
 		deck = new Deck();
-		for (int i = 0; i < players.size(); i++) {
-			if(players.get(i).inGame()){
-				players.get(i).addCard(deck);
-				try {
-					out = new ObjectOutputStream(bos);   
-					out.writeObject(players.get(i).getCards().get(0));
-					byte[] yourBytes = bos.toByteArray();
-					WarpClient.getInstance().sendPrivateUpdate(players.get(i).getName(), yourBytes);
-					
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-				finally {
+		for(int j = 0; j < 2; j++){
+			for (int i = 0; i < players.size(); i++) {
+				if(players.get(i).inGame()){
+					players.get(i).addCard(deck);
 					try {
-						if (out != null) {
-							out.close();
-						}
-					} catch (IOException ex) {
+						out = new ObjectOutputStream(bos);   
+						out.writeObject(players.get(i).getCards().get(j));
+						byte[] yourBytes = bos.toByteArray();
+						WarpClient.getInstance().sendPrivateUpdate(players.get(i).getName(), yourBytes);
+
+					} catch (Exception e) {
+						e.printStackTrace();
 					}
-					try {
-						bos.close();
-					} catch (IOException ex) {
+					finally {
+						try {
+							if (out != null) {
+								out.close();
+							}
+						} catch (IOException ex) {
+						}
+						try {
+							bos.close();
+						} catch (IOException ex) {
+						}
 					}
 				}
 			}

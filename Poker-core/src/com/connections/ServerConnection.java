@@ -51,7 +51,7 @@ public class ServerConnection extends ConnectionStrategy {
 			public void onCreateRoomDone(RoomEvent arg0) {
 				if(arg0.getResult() == WarpResponseResultCode.SUCCESS){
 					data = arg0.getData();
-					getWarpClient().joinRoom(data.getName());
+					getWarpClient().joinRoom(data.getId());
 				}
 
 			}
@@ -98,11 +98,11 @@ public class ServerConnection extends ConnectionStrategy {
 			@Override
 			public void onJoinRoomDone(RoomEvent arg0) {
 				if(arg0.getResult() == WarpResponseResultCode.SUCCESS){
-					getWarpClient().subscribeRoom(arg0.getData().getName());
+					getWarpClient().subscribeRoom(arg0.getData().getId());
 					StateMachine.getStateMachine().switchState(States.BOARD);
 				}
 				else{
-					getWarpClient().deleteRoom(arg0.getData().getName());
+					getWarpClient().deleteRoom(arg0.getData().getId());
 				}
 			}
 

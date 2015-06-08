@@ -28,6 +28,7 @@ public class BoardState implements GameState{
 
 	
 	public BoardState(){
+		game = new PokerGame();
 		game.addGameListener(new GameListener(){
 
 			@Override
@@ -45,7 +46,7 @@ public class BoardState implements GameState{
 						inGame = true;
 						game.addRound(waitingList);
 						waitingList.clear();
-						nextAction();
+						startAction();
 					}
 				}
 			}
@@ -57,7 +58,6 @@ public class BoardState implements GameState{
 	
 	@Override
 	public void create() {
-		game = new PokerGame();
 		try {
 			WarpClient.getInstance().addNotificationListener(new NotifyListener(){
 
@@ -148,7 +148,7 @@ public class BoardState implements GameState{
 						inGame = true;
 						game.addRound(waitingList);
 						waitingList.clear();
-						nextAction();
+						startAction();
 					}
 				}
 
@@ -174,7 +174,7 @@ public class BoardState implements GameState{
 		}
 	}
 	
-	private void nextAction() {
+	private void startAction() {
 		Player current = game.getNextPlayer();
 		ClientConnection.getWarpClient().sendPrivateChat(current.getName(), "MAX BET: " + game.getMaxBet());
 	}

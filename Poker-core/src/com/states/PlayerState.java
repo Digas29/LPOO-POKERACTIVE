@@ -87,7 +87,7 @@ public class PlayerState implements GameState {
 			public void onPrivateChatReceived(String arg0, String arg1) {
 				if(arg0.endsWith("server")){
 					if(arg1.startsWith("MAX BET: ")){
-						String amount = arg1.substring(("MAX BET: ").length(), arg1.length() - 1);
+						String amount = arg1.substring(("MAX BET: ").length() - 1, arg1.length() - 1);
 						int maxBet = Integer.parseInt(amount);
 						chooseAction(maxBet);
 					}

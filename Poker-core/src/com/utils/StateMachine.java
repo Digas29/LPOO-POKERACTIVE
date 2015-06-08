@@ -1,5 +1,6 @@
 package com.utils;
 
+import com.states.BoardState;
 import com.states.ChooseNameState;
 import com.states.ChooseRoomState;
 import com.states.InitialState;
@@ -28,6 +29,7 @@ public class StateMachine {
 	private ChooseRoomState chooseRoom = new ChooseRoomState();
 	private LoadingState loading = new LoadingState();
 	private PlayerState player = new PlayerState();
+	private BoardState board = new BoardState();
 	private static StateMachine machine = null;
 	
 	protected StateMachine(){
@@ -62,6 +64,7 @@ public class StateMachine {
 			currentState = loading;
 			break;
 		case BOARD:
+			currentState = board;
 			break;
 		default:
 			break;

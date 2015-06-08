@@ -71,13 +71,13 @@ public class ChooseNameState implements GameState {
         style.fontColor = Color.BLACK;
         textField = new TextField("", style);
         textField.setAlignment(Align.center);
-        textField.setOnscreenKeyboard(new OnscreenKeyboard() {
+        /*textField.setOnscreenKeyboard(new OnscreenKeyboard() {
             @Override
             public void show(boolean visible) {
             	if(Gdx.app.getType() == ApplicationType.Android && visible){
             		Gdx.input.setOnscreenKeyboardVisible(true);
             		if(!keyboardOnScreen){
-            			cam.translate(0, -Gdx.graphics.getHeight() * 0.4f);
+            			cam.translate(0, -stage.getHeight() * 0.4f);
             			cam.update();
             		}
             		keyboardOnScreen = true;
@@ -85,13 +85,13 @@ public class ChooseNameState implements GameState {
             	else if(Gdx.app.getType() == ApplicationType.Android && !visible){
             		Gdx.input.setOnscreenKeyboardVisible(false);
             		if(keyboardOnScreen){
-            			cam.translate(0, Gdx.graphics.getHeight() * 0.4f);
+            			cam.translate(0, stage.getHeight() * 0.4f);
             			cam.update();
             		}
             		keyboardOnScreen = false;
             	}
             }
-        });
+        });*/
         textField.addListener(new InputListener(){
 
 			@Override
