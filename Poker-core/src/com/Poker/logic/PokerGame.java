@@ -192,7 +192,6 @@ public class PokerGame {
 		default:
 			break;
 		}
-		System.out.println(rounds.get(rounds.size()-1) + "");
 		prepareQueue();
 		listener.gameEvent(new GameEvent("NEXT TURN",0));
 	}
@@ -284,5 +283,14 @@ public class PokerGame {
 	 */
 	public int getGameIteration() {
 		return gameIteration;
+	}
+	/**
+	 * Gets the table cards for the current round
+	 * 
+	 * @return actual table cards
+	 */
+	public Card[] getActualBoard() {
+		return rounds.get(rounds.size() -1).getBoard();
+		
 	}
 }

@@ -7,6 +7,7 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import com.Poker.logic.Card;
 import com.Poker.logic.Player;
 import com.Poker.logic.Player.Action;
 import com.Poker.logic.PokerGame;
@@ -43,6 +44,7 @@ public class BoardState implements GameState{
 	private ArrayList<Player> waitingList;
 	private Texture background;
 	private TextureAtlas circles;
+	private Texture cardsBackTexture;
 	private ArrayList<Label> textFields;
 	private LabelStyle style1;
 	private LabelStyle style2;
@@ -52,19 +54,28 @@ public class BoardState implements GameState{
 	private LabelStyle style6;
 	private Table table;
 	private Table table2;
+	private Table boardTable;
+	private Table playersTable;
 	private Stage stage;
 	private BitmapFont font;
 	private Skin skin;
 	
 	public BoardState(){
+		cardsBackTexture = new Texture(Gdx.files.internal("img/Card_back.png"));
 		font = new BitmapFont(Gdx.files.internal("fonts/trench.fnt"));
 		stage = new Stage(new FitViewport(1920,1080));
 		style1 = new LabelStyle();
 		circles = new TextureAtlas(Gdx.files.internal("img/circle.atlas"));
 		table = new Table();
 		table2 = new Table();
+		boardTable = new Table();
+		playersTable = new Table();
 		table.setBounds(0, 0, stage.getWidth(), stage.getHeight());
 		table2.setBounds(0, 0, stage.getWidth(), stage.getHeight());
+		boardTable.setBounds(0, 0, stage.getWidth(), stage.getHeight());
+		playersTable.setBounds(0, 0, stage.getWidth(), stage.getHeight());
+		boardTable.setLayoutEnabled(false);
+		playersTable.setLayoutEnabled(false);
 		skin = new Skin(circles);
 		style1.fontColor = Color.BLACK;
 		style1.font = font;
@@ -90,12 +101,15 @@ public class BoardState implements GameState{
 						ServerConnection.getWarpClient().sendPrivateChat(p.getName(), "WIN: " + total);
 					}
 					ServerConnection.getWarpClient().sendChat("END");
+					showFrontCards();
 					winners.clear();
 					try {
 						Thread.sleep(15000);
 					} catch (InterruptedException e1) {
 						e1.printStackTrace();
 					}
+					boardTable.clear();
+					playersTable.clear();
 					if(waitingList.size() + game.getPlayers().size() >= 2){
 						inGame = true;
 						game.addRound(waitingList);
@@ -113,9 +127,18 @@ public class BoardState implements GameState{
 				}
 				if(((String)e.getSource()).equals("NEXT TURN")){
 					ServerConnection.getWarpClient().sendChat("NEXT TURN");
-					Player current = game.getNextPlayer();
-					String message = "MAX BET: " + game.getMaxBet();
-					ServerConnection.getWarpClient().sendPrivateChat(current.getName(), message);
+					if(game.nrPlayersForAction() <= 1){
+						if(game.nrPlayersInGame() >= 1){
+							showBoard();
+						}
+						game.nextStage();
+					}
+					else{
+						showBoard();
+						Player current = game.getNextPlayer();
+						String message = "MAX BET: " + game.getMaxBet();
+						ServerConnection.getWarpClient().sendPrivateChat(current.getName(), message);
+					}
 				}
 			}
 
@@ -123,6 +146,37 @@ public class BoardState implements GameState{
 		});
 		inGame = false;
 		waitingList = new ArrayList<Player>();
+	}
+	
+	private void showBoard() {
+		Card[] cards= game.getActualBoard();
+		if(cards[3] == null){
+			Image img1 = new Image(PlayerState.getAtlasCards().findRegion(PlayerState.cardFileName(cards[0])));
+			Image img2 = new Image(PlayerState.getAtlasCards().findRegion(PlayerState.cardFileName(cards[1])));
+			Image img3 = new Image(PlayerState.getAtlasCards().findRegion(PlayerState.cardFileName(cards[2])));
+			img1.setSize(165.0f, 275.0f);
+			img2.setSize(165.0f, 275.0f);
+			img3.setSize(165.0f, 275.0f);
+			img1.setPosition(0.25f*stage.getWidth(), 0.37f*stage.getHeight());
+			img2.setPosition(0.35f*stage.getWidth(), 0.37f*stage.getHeight());
+			img3.setPosition(0.45f*stage.getWidth(), 0.37f*stage.getHeight());
+			boardTable.add(img1);
+			boardTable.add(img2);
+			boardTable.add(img3);
+		}
+		else if(cards[4] == null){
+			Image img4 = new Image(PlayerState.getAtlasCards().findRegion(PlayerState.cardFileName(cards[3])));
+			img4.setSize(165.0f, 275.0f);
+			img4.setPosition(0.55f*stage.getWidth(), 0.37f*stage.getHeight());
+			boardTable.add(img4);
+		}
+		else{
+			Image img5 = new Image(PlayerState.getAtlasCards().findRegion(PlayerState.cardFileName(cards[4])));
+			img5.setSize(165.0f, 275.0f);
+			img5.setPosition(0.65f*stage.getWidth(), 0.37f*stage.getHeight());
+			boardTable.add(img5);
+		}
+		
 	}
 	private void sendCards() {
 
@@ -153,6 +207,88 @@ public class BoardState implements GameState{
 					}
 				}
 			}	
+		}
+	}
+	
+	public void showBackCards(){
+		playersTable.clear();
+		for(int i = 0; i < game.getPlayers().size(); i++){
+			Player p= game.getPlayers().get(i);
+			if(p.inGame()){
+				Image img1 = new Image(new TextureRegion(cardsBackTexture, 0, 0, cardsBackTexture.getWidth(), cardsBackTexture.getHeight()));
+				Image img2 = new Image(new TextureRegion(cardsBackTexture, 0, 0, cardsBackTexture.getWidth(), cardsBackTexture.getHeight()));
+				img1.setSize(99.0f, 165.0f);
+				img2.setSize(99.0f, 165.0f);
+				switch(i){
+				case 0:
+					img1.setPosition(0.365f * stage.getWidth(), 0.675f * stage.getHeight());
+					img2.setPosition(0.395f * stage.getWidth(), 0.675f * stage.getHeight());
+					break;
+				case 1:
+					img1.setPosition(0.565f * stage.getWidth(), 0.675f * stage.getHeight());
+					img2.setPosition(0.595f * stage.getWidth(), 0.675f * stage.getHeight());
+					break;
+				case 2:
+					img1.setPosition(0.8f * stage.getWidth(), 0.4f * stage.getHeight());
+					img2.setPosition(0.83f * stage.getWidth(), 0.4f * stage.getHeight());
+					break;
+				case 3:
+					img1.setPosition(0.565f * stage.getWidth(), 0.2f * stage.getHeight());
+					img2.setPosition(0.595f * stage.getWidth(), 0.2f * stage.getHeight());
+					break;
+				case 4:
+					img1.setPosition(0.365f * stage.getWidth(), 0.2f * stage.getHeight());
+					img2.setPosition(0.395f * stage.getWidth(), 0.2f * stage.getHeight());
+					break;
+				case 5:
+					img1.setPosition(0.15f * stage.getWidth(), 0.4f * stage.getHeight());
+					img2.setPosition(0.18f * stage.getWidth(), 0.4f * stage.getHeight());
+					break;
+				}
+				playersTable.add(img1);
+				playersTable.add(img2);
+			}
+		}
+	}
+	
+	public void showFrontCards(){
+		playersTable.clear();
+		for(int i = 0; i < game.getPlayers().size(); i++){
+			Player p= game.getPlayers().get(i);
+			if(p.inGame()){
+				Image img1 = new Image(PlayerState.getAtlasCards().findRegion(PlayerState.cardFileName(p.getCards().get(0))));
+				Image img2 = new Image(PlayerState.getAtlasCards().findRegion(PlayerState.cardFileName(p.getCards().get(1))));
+				img1.setSize(99.0f, 165.0f);
+				img2.setSize(99.0f, 165.0f);
+				switch(i){
+				case 0:
+					img1.setPosition(0.365f * stage.getWidth(), 0.675f * stage.getHeight());
+					img2.setPosition(0.395f * stage.getWidth(), 0.675f * stage.getHeight());
+					break;
+				case 1:
+					img1.setPosition(0.565f * stage.getWidth(), 0.675f * stage.getHeight());
+					img2.setPosition(0.595f * stage.getWidth(), 0.675f * stage.getHeight());
+					break;
+				case 2:
+					img1.setPosition(0.8f * stage.getWidth(), 0.4f * stage.getHeight());
+					img2.setPosition(0.83f * stage.getWidth(), 0.4f * stage.getHeight());
+					break;
+				case 3:
+					img1.setPosition(0.565f * stage.getWidth(), 0.2f * stage.getHeight());
+					img2.setPosition(0.595f * stage.getWidth(), 0.2f * stage.getHeight());
+					break;
+				case 4:
+					img1.setPosition(0.365f * stage.getWidth(), 0.2f * stage.getHeight());
+					img2.setPosition(0.395f * stage.getWidth(), 0.2f * stage.getHeight());
+					break;
+				case 5:
+					img1.setPosition(0.15f * stage.getWidth(), 0.4f * stage.getHeight());
+					img2.setPosition(0.18f * stage.getWidth(), 0.4f * stage.getHeight());
+					break;
+				}
+				playersTable.add(img1);
+				playersTable.add(img2);
+			}
 		}
 	}
 	
@@ -196,13 +332,9 @@ public class BoardState implements GameState{
 						else{
 							game.playerAction(Action.RAISE, y, Integer.parseInt(arg1.substring("RAISE ".length(), arg1.length())));
 						}
+						showBackCards();
 						textFields.get(game.getPlayers().indexOf(y)).setText(y.getName() + "\n" + "$" + y.getMoney());
 						Player x = game.getNextPlayer();
-						if(game.nrPlayersForAction() <= 1){
-							while(game.getGameIteration() < 4){
-								game.nextStage();
-							}
-						}
 						if(x == null){
 							game.nextStage();
 						}
@@ -336,6 +468,8 @@ public class BoardState implements GameState{
 		table2.center();
 		stage.addActor(table);
 		stage.addActor(table2);
+		stage.addActor(boardTable);
+		stage.addActor(playersTable);
 	}
 	
 	private void startAction() {

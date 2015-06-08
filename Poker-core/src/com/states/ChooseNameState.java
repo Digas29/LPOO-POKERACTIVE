@@ -3,11 +3,9 @@ package com.states;
 
 import com.Poker.Poker;
 import com.badlogic.gdx.Application;
-import com.badlogic.gdx.Application.ApplicationType;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
@@ -19,7 +17,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
-import com.badlogic.gdx.scenes.scene2d.ui.TextField.OnscreenKeyboard;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField.TextFieldStyle;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.FitViewport;
@@ -41,11 +38,8 @@ public class ChooseNameState implements GameState {
 	private Skin skin;
 	private BitmapFont fontBlack;
 	private BitmapFont fontRed;
-	private OrthographicCamera cam;
-	private boolean keyboardOnScreen;
 	
 	public ChooseNameState(){
-		keyboardOnScreen = false;
 		stage = new Stage(new FitViewport(1920, 1080));
 		atlas = new TextureAtlas(Gdx.files.internal("img/buttons.atlas"));
 		skin = new Skin(atlas);

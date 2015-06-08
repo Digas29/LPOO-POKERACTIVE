@@ -5,8 +5,6 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectInputStream;
 import java.util.HashMap;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import com.Poker.logic.Card;
 import com.Poker.logic.Player;
@@ -48,12 +46,11 @@ public class PlayerState implements GameState {
 	private Image cardBackRight;
 	private TextButtonStyle style;
 	private Player player;
-	//private final int waitResponce = 15;
 	private String serverName = null;
-	private static Skin skinButtons = null;
+	private Skin skinButtons;
 	private BitmapFont font;
 	private TextureAtlas atlasButtons;
-	private TextureAtlas atlasCards;
+	private static TextureAtlas atlasCards;
 	private TextButton foldButton;
 	private TextButton callButton;
 	private TextButton raiseButton;
@@ -278,7 +275,6 @@ public class PlayerState implements GameState {
 				super.clicked(event, x, y);
 				if(!foldButton.isDisabled()){
 					if(player.update(Action.FOLD, maxBet, 0) >= 0){
-						//timer.cancel();
 						foldButton.setDisabled(true);
 						callButton.setDisabled(true);
 						raiseButton.setDisabled(true);
@@ -299,7 +295,6 @@ public class PlayerState implements GameState {
 				super.clicked(event, x, y);
 				if(!callButton.isDisabled()){
 					if(player.update(Action.CALL, maxBet, 0) >= 0){
-						//timer.cancel();
 						foldButton.setDisabled(true);
 						callButton.setDisabled(true);
 						raiseButton.setDisabled(true);
@@ -320,7 +315,6 @@ public class PlayerState implements GameState {
 				super.clicked(event, x, y);
 				if(!raiseButton.isDisabled()){
 					if(player.update(Action.RAISE, maxBet, 100) >= 0){
-						//timer.cancel();
 						foldButton.setDisabled(true);
 						callButton.setDisabled(true);
 						raiseButton.setDisabled(true);
@@ -377,21 +371,12 @@ public class PlayerState implements GameState {
 		foldButton.setDisabled(false);
 		callButton.setDisabled(false);
 		raiseButton.setDisabled(false);
-		/*timer.schedule(new TimerTask(){
-			
-			@Override
-			public void run() {
-				player.update(Action.FOLD, maxBet, 0);
-				ClientConnection.getWarpClient().sendPrivateChat(serverName, Action.FOLD.toString());
-			}
-			
-		}, waitResponce*1000);*/
 	}
 	public static String cardFileName(Card card){
 		return Card.rankAsString(card.getRank()) + "_of_" + Card.suitAsString(card.getSuit());
 	}
 	
-	public static Skin getSkinButtons() {
-		return skinButtons;
+	public static TextureAtlas getAtlasCards() {
+		return atlasCards;
 	}
 }

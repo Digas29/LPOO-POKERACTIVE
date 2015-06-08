@@ -124,4 +124,14 @@ public class Round {
     public Deck getDeck(){
     	return deck;
     }
+    
+    /**
+	 * Get table cards for this round
+	 * 
+	 * @return table cards
+	 * 
+	 */
+	public Card[] getBoard() {
+		return board;
+	}
 }

@@ -176,6 +176,9 @@ public class Player {
 	 */
 	public int update(Action action, int maxBet, int raiseAmount) {
 		if (action == Action.FOLD){
+			if(maxBet == 0){
+				return -1;
+			}
 			setOutOfGame();
 			return 0;
 		}

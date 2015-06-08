@@ -93,7 +93,7 @@ public class ChooseRoomState implements GameState {
 
         
         for(int i = 0; i < ClientConnection.getRooms().size(); i++){
-        	if(ClientConnection.getNrPlayers().get(i).intValue() - 1 >=0){
+        	if(ClientConnection.getNrPlayers().get(i).intValue() - 1 >= 0){
         		TextButton left = new TextButton(ClientConnection.getRooms().get(i).getName(), styleLeft);
         		TextButton right = new TextButton((ClientConnection.getNrPlayers().get(i).intValue() - 1) + "/" + (ClientConnection.getRooms().get(i).getMaxUsers() - 1), styleRight);
         		final String id = ClientConnection.getRooms().get(i).getId();
