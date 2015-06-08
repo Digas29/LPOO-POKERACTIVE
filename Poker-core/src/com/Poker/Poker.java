@@ -7,6 +7,7 @@ import com.utils.StateMachine;
 
 public class Poker implements ApplicationListener{ 
     private static boolean server = false;
+    
     public static boolean isServer() {
 		return server;
 	}

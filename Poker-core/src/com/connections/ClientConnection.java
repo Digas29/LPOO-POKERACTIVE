@@ -2,7 +2,6 @@ package com.connections;
 
 import java.util.ArrayList;
 
-import com.badlogic.gdx.Gdx;
 import com.shephertz.app42.gaming.multiplayer.client.command.WarpResponseResultCode;
 import com.shephertz.app42.gaming.multiplayer.client.events.AllRoomsEvent;
 import com.shephertz.app42.gaming.multiplayer.client.events.AllUsersEvent;
@@ -15,28 +14,31 @@ import com.shephertz.app42.gaming.multiplayer.client.events.RoomEvent;
 import com.shephertz.app42.gaming.multiplayer.client.listener.ConnectionRequestListener;
 import com.shephertz.app42.gaming.multiplayer.client.listener.RoomRequestListener;
 import com.shephertz.app42.gaming.multiplayer.client.listener.ZoneRequestListener;
+import com.states.ChooseRoomState;
 import com.utils.ConnectionStrategy;
 import com.utils.StateMachine;
 import com.utils.StateMachine.States;
 
 public class ClientConnection extends ConnectionStrategy {
+	private static String name;
 	private static ArrayList<RoomData> rooms  = new ArrayList<RoomData>();
 	private static ArrayList<Integer> nrPlayers  = new ArrayList<Integer>();
-	
 	private int totalRooms;
+	
 	@Override
 	public void connect(String name) {
+		ClientConnection.name = name;
 		totalRooms = 0;
 		init();
-		warpClient.addConnectionRequestListener(new ConnectionRequestListener(){
+		getWarpClient().addConnectionRequestListener(new ConnectionRequestListener(){
 
 			@Override
 			public void onConnectDone(ConnectEvent arg0) {
 				if(arg0.getResult() == WarpResponseResultCode.SUCCESS){
-					warpClient.getAllRooms();
+					getWarpClient().getAllRooms();
 				}
 				else{
-					System.exit(0);
+					StateMachine.getStateMachine().switchState(States.STRATEGY);
 				}
 				
 			}
@@ -52,28 +54,34 @@ public class ClientConnection extends ConnectionStrategy {
 			}
 			
 		});
-		warpClient.addZoneRequestListener(new ZoneRequestListener(){
+		getWarpClient().addZoneRequestListener(new ZoneRequestListener(){
 
 			@Override
 			public void onCreateRoomDone(RoomEvent arg0) {
-				
+				if(StateMachine.getStateMachine().getCurrentState().getClass() == ChooseRoomState.class){
+					StateMachine.getStateMachine().recreate();
+				}
 			}
 
 			@Override
 			public void onDeleteRoomDone(RoomEvent arg0) {
-				
+				if(StateMachine.getStateMachine().getCurrentState().getClass() == ChooseRoomState.class){
+					StateMachine.getStateMachine().recreate();
+				}
 			}
 
 			@Override
 			public void onGetAllRoomsDone(AllRoomsEvent arg0) {
-				Gdx.app.log("pito", "my informative message");
 				String [] array = arg0.getRoomIds();
-				totalRooms = array.length;
-				for(int i = 0; i < array.length; i++){
-					Gdx.app.log("sala", "my informative message " + array[i]);
-					warpClient.getLiveRoomInfo(array[i]);
+				if(array != null){
+					totalRooms = array.length;
+					for(int i = 0; i < array.length; i++){
+						getWarpClient().getLiveRoomInfo(array[i]);
+					}
 				}
-				Gdx.app.log("cona", "my informative message");
+				else{
+					StateMachine.getStateMachine().switchState(States.CHOOSE_ROOM);
+				}
 			}
 
 			@Override
@@ -97,7 +105,7 @@ public class ClientConnection extends ConnectionStrategy {
 			}
 			
 		});
-		warpClient.addRoomRequestListener(new RoomRequestListener(){
+		getWarpClient().addRoomRequestListener(new RoomRequestListener(){
 
 			@Override
 			public void onGetLiveRoomInfoDone(LiveRoomInfoEvent arg0) {
@@ -115,12 +123,16 @@ public class ClientConnection extends ConnectionStrategy {
 
 			@Override
 			public void onJoinRoomDone(RoomEvent arg0) {
+				if(arg0.getResult() == WarpResponseResultCode.SUCCESS)
+					getWarpClient().subscribeRoom(arg0.getData().getId());
+				else
+					StateMachine.getStateMachine().switchState(States.CHOOSE_ROOM);
 				
 			}
 
 			@Override
 			public void onLeaveRoomDone(RoomEvent arg0) {
-				
+				StateMachine.getStateMachine().switchState(States.CHOOSE_ROOM);
 			}
 
 			@Override
@@ -135,7 +147,11 @@ public class ClientConnection extends ConnectionStrategy {
 
 			@Override
 			public void onSubscribeRoomDone(RoomEvent arg0) {
-				
+				if(arg0.getResult() == WarpResponseResultCode.SUCCESS)
+					StateMachine.getStateMachine().switchState(States.PLAYER);
+				else{
+					getWarpClient().leaveRoom(arg0.getData().getId());
+				}
 			}
 
 			@Override
@@ -154,7 +170,7 @@ public class ClientConnection extends ConnectionStrategy {
 			}
 			
 		});
-		warpClient.connectWithUserName(name);
+		getWarpClient().connectWithUserName(name);
 	}
 
 	@Override
@@ -168,5 +184,9 @@ public class ClientConnection extends ConnectionStrategy {
 	
 	public static ArrayList<Integer> getNrPlayers() {
 		return nrPlayers;
+	}
+	
+	public static String getName() {
+		return name;
 	}
 }

@@ -21,7 +21,10 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.connections.ClientConnection;
+import com.shephertz.app42.gaming.multiplayer.client.WarpClient;
 import com.utils.GameState;
+import com.utils.StateMachine;
+import com.utils.StateMachine.States;
 
 public class ChooseRoomState implements GameState {
 	private Texture textureBackgroud;
@@ -53,7 +56,6 @@ public class ChooseRoomState implements GameState {
 		table = new Table();
 		rows = new Table();
 		rowsHeaders = new Table();
-		//ScrollPaneStyle scrollStyle = new ScrollPaneStyle();
 		
 		pane = new ScrollPane(rows);
 		
@@ -82,28 +84,48 @@ public class ChooseRoomState implements GameState {
         rowsHeaders.add(ocupationColumn).prefWidth(400);
         TextButtonStyle styleLeft = new TextButtonStyle();
         styleLeft.font =  fontBlack;
-        styleLeft.over = skin.getDrawable("table_down_left");
-        styleLeft.down = skin.getDrawable("table_down_left");
-        styleLeft.up = skin.getDrawable("table_down_left");
+        styleLeft.up = skin.getDrawable("table_up_left");
         
         TextButtonStyle styleRight = new TextButtonStyle();
         styleRight.font =  fontBlack;
-        styleRight.over = skin.getDrawable("table_down_right");
-        styleRight.down = skin.getDrawable("table_down_right");
-        styleRight.up = skin.getDrawable("table_down_right");
+        styleRight.up = skin.getDrawable("table_up_right");
+        
+
+        
         for(int i = 0; i < ClientConnection.getRooms().size(); i++){
-        	TextButton a = new TextButton(ClientConnection.getRooms().get(i).getName(), styleLeft);
-        	TextButton b = new TextButton(ClientConnection.getNrPlayers().get(i) + "/" + ClientConnection.getRooms().get(i).getMaxUsers(), styleRight);
-        	a.addCaptureListener(new ClickListener(){
+        	TextButton left = new TextButton(ClientConnection.getRooms().get(i).getName(), styleLeft);
+        	TextButton right = new TextButton((ClientConnection.getNrPlayers().get(i).intValue() - 1) + "/" + (ClientConnection.getRooms().get(i).getMaxUsers() - 1), styleRight);
+        	final String id = ClientConnection.getRooms().get(i).getId();
+        	left.addCaptureListener(new ClickListener(){
 
 				@Override
 				public void clicked(InputEvent event, float x, float y) {
+					try {
+						WarpClient.getInstance().joinRoom(id);
+						StateMachine.getStateMachine().switchState(States.LOADING);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
 					super.clicked(event, x, y);
 				}
         		
         	});
-        	rows.add(a).prefWidth(400).spaceBottom(5.0f);
-        	rows.add(b).prefWidth(400).spaceBottom(5.0f).row();
+        	right.addCaptureListener(new ClickListener(){
+
+				@Override
+				public void clicked(InputEvent event, float x, float y) {
+					try {
+						WarpClient.getInstance().joinRoom(id);
+						StateMachine.getStateMachine().switchState(States.LOADING);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+					super.clicked(event, x, y);
+				}
+        		
+        	});
+        	rows.add(left).prefWidth(400).spaceBottom(5.0f);
+        	rows.add(right).prefWidth(400).spaceBottom(5.0f).row();
         }
         
         

@@ -4,6 +4,7 @@ import com.states.ChooseNameState;
 import com.states.ChooseRoomState;
 import com.states.InitialState;
 import com.states.LoadingState;
+import com.states.PlayerState;
 import com.states.StrategyState;
 
 
@@ -11,12 +12,13 @@ import com.states.StrategyState;
 public class StateMachine {
 	
 	public enum States{
-		PLAY,
+		PLAYER,
 		CHOOSE_ROOM,
 		CHOOSE_NAME,
 		INITIAL,
 		STRATEGY,
-		LOADING
+		LOADING,
+		BOARD
 	}
 	
 	private GameState currentState;
@@ -25,6 +27,7 @@ public class StateMachine {
 	private ChooseNameState chooseName = new ChooseNameState();
 	private ChooseRoomState chooseRoom = new ChooseRoomState();
 	private LoadingState loading = new LoadingState();
+	private PlayerState player = new PlayerState();
 	private static StateMachine machine = null;
 	
 	protected StateMachine(){
@@ -46,7 +49,8 @@ public class StateMachine {
 		case STRATEGY:
 			currentState = strategy;
 			break;
-		case PLAY:
+		case PLAYER:
+			currentState = player;
 			break;
 		case CHOOSE_ROOM:
 			currentState = chooseRoom;
@@ -56,6 +60,8 @@ public class StateMachine {
 			break;
 		case LOADING:
 			currentState = loading;
+			break;
+		case BOARD:
 			break;
 		default:
 			break;

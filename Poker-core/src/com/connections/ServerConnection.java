@@ -1,30 +1,36 @@
 package com.connections;
 
+
 import com.shephertz.app42.gaming.multiplayer.client.command.WarpResponseResultCode;
 import com.shephertz.app42.gaming.multiplayer.client.events.AllRoomsEvent;
 import com.shephertz.app42.gaming.multiplayer.client.events.AllUsersEvent;
 import com.shephertz.app42.gaming.multiplayer.client.events.ConnectEvent;
+import com.shephertz.app42.gaming.multiplayer.client.events.LiveRoomInfoEvent;
 import com.shephertz.app42.gaming.multiplayer.client.events.LiveUserInfoEvent;
 import com.shephertz.app42.gaming.multiplayer.client.events.MatchedRoomsEvent;
 import com.shephertz.app42.gaming.multiplayer.client.events.RoomData;
 import com.shephertz.app42.gaming.multiplayer.client.events.RoomEvent;
 import com.shephertz.app42.gaming.multiplayer.client.listener.ConnectionRequestListener;
+import com.shephertz.app42.gaming.multiplayer.client.listener.RoomRequestListener;
 import com.shephertz.app42.gaming.multiplayer.client.listener.ZoneRequestListener;
 import com.utils.ConnectionStrategy;
+import com.utils.StateMachine;
+import com.utils.StateMachine.States;
 
 public class ServerConnection extends ConnectionStrategy {
 
 	private RoomData data;
+	
 	@Override
 	public void connect(String name) {
 		final String room = name;
 		init();
-		warpClient.addConnectionRequestListener(new ConnectionRequestListener(){
+		getWarpClient().addConnectionRequestListener(new ConnectionRequestListener(){
 
 			@Override
 			public void onConnectDone(ConnectEvent arg0) {
 				if(arg0.getResult() == WarpResponseResultCode.SUCCESS){
-					warpClient.createTurnRoom(room, "admin", 6, null, 15);
+					getWarpClient().createRoom(room, "admin", 7, null);
 				}
 			}
 
@@ -39,12 +45,13 @@ public class ServerConnection extends ConnectionStrategy {
 			}
 
 		});
-		warpClient.addZoneRequestListener(new ZoneRequestListener(){
+		getWarpClient().addZoneRequestListener(new ZoneRequestListener(){
 
 			@Override
 			public void onCreateRoomDone(RoomEvent arg0) {
 				if(arg0.getResult() == WarpResponseResultCode.SUCCESS){
 					data = arg0.getData();
+					getWarpClient().joinRoom(data.getName());
 				}
 
 			}
@@ -52,7 +59,7 @@ public class ServerConnection extends ConnectionStrategy {
 			@Override
 			public void onDeleteRoomDone(RoomEvent arg0) {
 				if(arg0.getResult() == WarpResponseResultCode.SUCCESS)
-					System.out.println("Room deleted!!!");
+					StateMachine.getStateMachine().switchState(States.STRATEGY);
 			}
 
 			@Override
@@ -81,12 +88,66 @@ public class ServerConnection extends ConnectionStrategy {
 			}
 
 		});
-		warpClient.connectWithUserName(name + " desk");
+		getWarpClient().addRoomRequestListener(new RoomRequestListener(){
+
+			@Override
+			public void onGetLiveRoomInfoDone(LiveRoomInfoEvent arg0) {
+				
+			}
+
+			@Override
+			public void onJoinRoomDone(RoomEvent arg0) {
+				if(arg0.getResult() == WarpResponseResultCode.SUCCESS){
+					getWarpClient().subscribeRoom(arg0.getData().getName());
+					StateMachine.getStateMachine().switchState(States.BOARD);
+				}
+				else{
+					getWarpClient().deleteRoom(arg0.getData().getName());
+				}
+			}
+
+			@Override
+			public void onLeaveRoomDone(RoomEvent arg0) {
+				
+			}
+
+			@Override
+			public void onLockPropertiesDone(byte arg0) {
+				
+			}
+
+			@Override
+			public void onSetCustomRoomDataDone(LiveRoomInfoEvent arg0) {
+				
+			}
+
+			@Override
+			public void onSubscribeRoomDone(RoomEvent arg0) {
+				
+			}
+
+			@Override
+			public void onUnSubscribeRoomDone(RoomEvent arg0) {
+				
+			}
+
+			@Override
+			public void onUnlockPropertiesDone(byte arg0) {
+				
+			}
+
+			@Override
+			public void onUpdatePropertyDone(LiveRoomInfoEvent arg0) {
+				
+			}
+		});
+
+		getWarpClient().connectWithUserName(name + " server");
 	}
 
 	@Override
 	public void disconnect() {
-		warpClient.deleteRoom(data.getId());
+		getWarpClient().deleteRoom(data.getId());
 	}
 
 }
