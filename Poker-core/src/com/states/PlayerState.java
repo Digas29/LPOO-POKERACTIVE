@@ -5,17 +5,27 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectInputStream;
 import java.util.HashMap;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import com.Poker.logic.Card;
 import com.Poker.logic.Player;
 import com.Poker.logic.Player.Action;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.connections.ClientConnection;
 import com.shephertz.app42.gaming.multiplayer.client.events.ChatEvent;
@@ -33,35 +43,44 @@ public class PlayerState implements GameState {
 	private Stage stage;
 	private Table tableL;
 	private Table tableR;
+	private Table table;
 	private Image cardBackLeft;
 	private Image cardBackRight;
+	private TextButtonStyle style;
 	private Player player;
 	private final int waitResponce = 15;
 	private String serverName = null;
-	private Thread t = new Thread(){
-
-		@Override
-		public void run() {
-			super.run();
-			try {
-				Thread.sleep(waitResponce*1000);
-				
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-			
-		}
-		
-	};
+	private Skin skin;
+	private BitmapFont font;
+	private TextureAtlas atlas;
+	private TextButton foldButton;
+	private TextButton callButton;
+	private TextButton raiseButton;
+	private int maxBet;
+	private Timer timer;
 	
 	public PlayerState(){
+		timer = new Timer();
+		maxBet = 0;
+		font = new BitmapFont(Gdx.files.internal("fonts/trench.fnt"));
 		tableL = new Table();
 		tableR = new Table();
+		table = new Table();
 		stage = new Stage(new FitViewport(1920,1080));
 		cardsBackTexture = new Texture(Gdx.files.internal("img/Card_back.png"));
+		atlas = new TextureAtlas(Gdx.files.internal("img/action_buttons.atlas"));
+		skin = new Skin(atlas);
+		style = new TextButtonStyle();
+        style.font = font;
+        style.fontColor = Color.BLACK;
+        style.up = skin.getDrawable("action_up");
+        style.down = skin.getDrawable("action_over");
+        style.over = skin.getDrawable("action_over");
+        style.disabled = skin.getDrawable("action_disable");
 	}
 	@Override
 	public void create() {
+		Gdx.input.setInputProcessor(stage);
 		ClientConnection.getWarpClient().addNotificationListener(new NotifyListener(){
 
 			@Override
@@ -101,8 +120,8 @@ public class PlayerState implements GameState {
 				if(arg0.endsWith("server")){
 					if(arg1.startsWith("MAX BET: ")){
 						String amount = arg1.substring(("MAX BET: ").length(), arg1.length());
-						int maxBet = Integer.parseInt(amount);
-						chooseAction(maxBet);
+						maxBet = Integer.parseInt(amount);
+						chooseAction();
 					}
 					else if(arg1.startsWith("WIN: ")){
 						String amount = arg1.substring(("WIN: ").length(), arg1.length());
@@ -201,9 +220,10 @@ public class PlayerState implements GameState {
 		});
 		
 		player = new Player(1000, ClientConnection.getName());
+		
 		tableL.setBounds(0, 0, stage.getWidth()/2.0f, stage.getHeight());
 		tableR.setBounds(stage.getWidth()/2.0f, 0, stage.getWidth()/2.0f, stage.getHeight());
-		
+		table.setBounds(0, 0, stage.getWidth(), stage.getHeight());
 		TextureRegion region = new TextureRegion(cardsBackTexture, 0, 0, cardsBackTexture.getWidth(), cardsBackTexture.getHeight());          
 		cardBackLeft = new Image(region);
 		cardBackRight = new Image(region);
@@ -213,9 +233,75 @@ public class PlayerState implements GameState {
 		tableL.addActor(cardBackLeft);
 		tableR.addActor(cardBackRight);
 		
+		foldButton = new TextButton("FOLD",style);
+		foldButton.setDisabled(true);
+		foldButton.addListener(new ClickListener(){
+
+			@Override
+			public void clicked(InputEvent event, float x, float y) {
+				super.clicked(event, x, y);
+				if(!foldButton.isDisabled()){
+					if(player.update(Action.FOLD, maxBet, 0) >= 0){
+						timer.cancel();
+						foldButton.setDisabled(true);
+						callButton.setDisabled(true);
+						raiseButton.setDisabled(true);
+						moveUpCards();
+						ClientConnection.getWarpClient().sendPrivateChat(serverName, Action.FOLD.toString());
+					}
+				}
+			}
+			
+		});
+		
+		callButton = new TextButton("CHECK/CALL",style);
+		callButton.setDisabled(true);
+		callButton.addListener(new ClickListener(){
+			
+			@Override
+			public void clicked(InputEvent event, float x, float y) {
+				super.clicked(event, x, y);
+				if(!callButton.isDisabled()){
+					if(player.update(Action.CALL, maxBet, 0) >= 0){
+						timer.cancel();
+						foldButton.setDisabled(true);
+						callButton.setDisabled(true);
+						raiseButton.setDisabled(true);
+						ClientConnection.getWarpClient().sendPrivateChat(serverName, Action.CALL.toString());
+					}
+				}
+			}
+			
+		});
+		
+		raiseButton = new TextButton("RAISE",style);
+		raiseButton.setDisabled(true);
+		
+		raiseButton.addListener(new ClickListener(){
+			
+			@Override
+			public void clicked(InputEvent event, float x, float y) {
+				super.clicked(event, x, y);
+				if(!raiseButton.isDisabled()){
+					if(player.update(Action.RAISE, maxBet, 100) >= 0){
+						timer.cancel();
+						foldButton.setDisabled(true);
+						callButton.setDisabled(true);
+						raiseButton.setDisabled(true);
+						ClientConnection.getWarpClient().sendPrivateChat(serverName, Action.RAISE.toString() + " " + 100);
+					}
+				}
+			}
+			
+		});
+		
+		table.add(foldButton).spaceRight(10.0f).prefWidth(300.0f).padTop(0.9f*stage.getHeight());
+		table.add(callButton).spaceRight(10.0f).prefWidth(300.0f).padTop(0.9f*stage.getHeight());
+		table.add(raiseButton).prefWidth(300.0f).padTop(0.9f*stage.getHeight());
 		
 		stage.addActor(tableL);
 		stage.addActor(tableR);
+		stage.addActor(table);
 	}
 
 	@Override
@@ -245,17 +331,20 @@ public class PlayerState implements GameState {
 		cardBackLeft.addAction(Actions.moveBy(0, stage.getHeight(), 1.0f));
 		cardBackRight.addAction(Actions.moveBy(0, stage.getHeight(), 1.0f));
 	}
-	private void chooseAction(int maxBet) {
-		//t.start();
+	private void chooseAction() {
 		Gdx.input.vibrate(1000);
-		player.update(Action.CALL, maxBet, 0);
-		ClientConnection.getWarpClient().sendPrivateChat(serverName,Player.Action.CALL.toString());
-		/*try{
-			t.interrupt();
-		}
-		catch(Exception e){
-			e.printStackTrace();
-		}*/
+		foldButton.setDisabled(false);
+		callButton.setDisabled(false);
+		raiseButton.setDisabled(false);
+		timer.schedule(new TimerTask(){
+			
+			@Override
+			public void run() {
+				player.update(Action.FOLD, maxBet, 0);
+				ClientConnection.getWarpClient().sendPrivateChat(serverName, Action.FOLD.toString());
+			}
+			
+		}, waitResponce*1000);
 	}
 
 }
