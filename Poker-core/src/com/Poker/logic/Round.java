@@ -6,6 +6,7 @@ import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 
+import com.connections.ServerConnection;
 import com.shephertz.app42.gaming.multiplayer.client.WarpClient;
 
 public class Round {
@@ -26,7 +27,7 @@ public class Round {
 						out = new ObjectOutputStream(bos);   
 						out.writeObject(players.get(i).getCards().get(j));
 						byte[] yourBytes = bos.toByteArray();
-						WarpClient.getInstance().sendPrivateUpdate(players.get(i).getName(), yourBytes);
+						ServerConnection.getWarpClient().sendPrivateUpdate(players.get(i).getName(), yourBytes);
 
 					} catch (Exception e) {
 						e.printStackTrace();
