@@ -46,6 +46,7 @@ public class BoardState implements GameState{
 	private TextureAtlas circles;
 	private Texture cardsBackTexture;
 	private ArrayList<Label> textFields;
+	private Table winTable;
 	private LabelStyle style1;
 	private LabelStyle style2;
 	private LabelStyle style3;
@@ -58,11 +59,13 @@ public class BoardState implements GameState{
 	private Table playersTable;
 	private Stage stage;
 	private BitmapFont font;
+	private BitmapFont fontRed;
 	private Skin skin;
 	
 	public BoardState(){
 		cardsBackTexture = new Texture(Gdx.files.internal("img/Card_back.png"));
 		font = new BitmapFont(Gdx.files.internal("fonts/trench.fnt"));
+		fontRed = new BitmapFont(Gdx.files.internal("fonts/trench_red.fnt"));
 		stage = new Stage(new FitViewport(1920,1080));
 		style1 = new LabelStyle();
 		circles = new TextureAtlas(Gdx.files.internal("img/circle.atlas"));
@@ -70,10 +73,12 @@ public class BoardState implements GameState{
 		table2 = new Table();
 		boardTable = new Table();
 		playersTable = new Table();
+		winTable = new Table();
 		table.setBounds(0, 0, stage.getWidth(), stage.getHeight());
 		table2.setBounds(0, 0, stage.getWidth(), stage.getHeight());
 		boardTable.setBounds(0, 0, stage.getWidth(), stage.getHeight());
 		playersTable.setBounds(0, 0, stage.getWidth(), stage.getHeight());
+		winTable.setBounds(0, 0, stage.getWidth(), stage.getHeight());
 		boardTable.setLayoutEnabled(false);
 		playersTable.setLayoutEnabled(false);
 		skin = new Skin(circles);
@@ -97,6 +102,11 @@ public class BoardState implements GameState{
 					ArrayList<Player> winners = game.getWinners();
 					int total = game.getPot()/winners.size();
 					for(Player p : winners){
+						LabelStyle style = new LabelStyle();
+						style.font = fontRed;
+						style.fontColor = Color.RED;
+						Label label = new Label(p.getName() + " won " + total + " of " + game.getPot()  +" pot",style); 
+						winTable.add(label);
 						p.addMoney(total);
 						ServerConnection.getWarpClient().sendPrivateChat(p.getName(), "WIN: " + total);
 					}
@@ -108,6 +118,7 @@ public class BoardState implements GameState{
 					} catch (InterruptedException e1) {
 						e1.printStackTrace();
 					}
+					winTable.clear();
 					boardTable.clear();
 					playersTable.clear();
 					if(waitingList.size() + game.getPlayers().size() >= 2){
@@ -136,6 +147,7 @@ public class BoardState implements GameState{
 					else{
 						showBoard();
 						Player current = game.getNextPlayer();
+						textFields.get(game.getPlayers().indexOf(current)).getStyle().background = skin.getDrawable("circle_selected");
 						String message = "MAX BET: " + game.getMaxBet();
 						ServerConnection.getWarpClient().sendPrivateChat(current.getName(), message);
 					}
@@ -393,6 +405,7 @@ public class BoardState implements GameState{
 						Player p = game.getPlayers().get(i);
 						textFields.get(i).setText(p.getName() + "\n" + "$" + p.getMoney());
 					}
+					showBackCards();
 					sendCards();
 					startAction();
 				}
@@ -470,6 +483,7 @@ public class BoardState implements GameState{
 		stage.addActor(table2);
 		stage.addActor(boardTable);
 		stage.addActor(playersTable);
+		stage.addActor(winTable);
 	}
 	
 	private void startAction() {
