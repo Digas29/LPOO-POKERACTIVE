@@ -8,9 +8,7 @@ import com.Poker.logic.Player.Action;
 import com.Poker.logic.PokerGame;
 import com.Poker.events.GameEvent;
 import com.Poker.events.GameListener;
-import com.connections.ClientConnection;
 import com.connections.ServerConnection;
-import com.shephertz.app42.gaming.multiplayer.client.WarpClient;
 import com.shephertz.app42.gaming.multiplayer.client.events.ChatEvent;
 import com.shephertz.app42.gaming.multiplayer.client.events.LobbyData;
 import com.shephertz.app42.gaming.multiplayer.client.events.MoveEvent;
@@ -33,7 +31,7 @@ public class BoardState implements GameState{
 
 			@Override
 			public synchronized void gameEvent(GameEvent e) {
-				if((String)e.getSource() == "END"){
+				if(((String)e.getSource()).equals("END")){
 					inGame = false;
 					ArrayList<Player> winners = game.getWinners();
 					int total = game.getPot()/winners.size();
@@ -41,13 +39,25 @@ public class BoardState implements GameState{
 						p.addMoney(total);
 						ServerConnection.getWarpClient().sendPrivateChat(p.getName(), "WIN: " + total);
 					}
+					ServerConnection.getWarpClient().sendChat("END");
 					winners.clear();
+					try {
+						Thread.sleep(5000);
+					} catch (InterruptedException e1) {
+						e1.printStackTrace();
+					}
 					if(waitingList.size() + game.getPlayers().size() >= 2){
 						inGame = true;
 						game.addRound(waitingList);
 						waitingList.clear();
 						startAction();
 					}
+				}
+				if(((String)e.getSource()).equals("NEXT TURN")){
+					ServerConnection.getWarpClient().sendChat("NEXT TURN");
+					Player current = game.getNextPlayer();
+					String message = "MAX BET: " + game.getMaxBet();
+					ServerConnection.getWarpClient().sendPrivateChat(current.getName(), message);
 				}
 			}
 			
@@ -58,125 +68,128 @@ public class BoardState implements GameState{
 	
 	@Override
 	public void create() {
-		try {
-			WarpClient.getInstance().addNotificationListener(new NotifyListener(){
+		ServerConnection.getWarpClient().addNotificationListener(new NotifyListener(){
 
-				@Override
-				public void onChatReceived(ChatEvent arg0) {
-					
-				}
+			@Override
+			public void onChatReceived(ChatEvent arg0) {
 
-				@Override
-				public void onGameStarted(String arg0, String arg1, String arg2) {
-					
-				}
+			}
 
-				@Override
-				public void onGameStopped(String arg0, String arg1) {
-					
-				}
+			@Override
+			public void onGameStarted(String arg0, String arg1, String arg2) {
 
-				@Override
-				public void onMoveCompleted(MoveEvent arg0) {
-					
-				}
+			}
 
-				@Override
-				public void onPrivateChatReceived(String arg0, String arg1) {
-					for(Player y: game.getPlayers()){
-						if(y.getName() == arg0){
-							if(arg1.contains("CALL")){
-								game.playerAction(Action.CALL, y, 0);
-							}
-							else if(arg1.contains("FOLD")){
-								game.playerAction(Action.FOLD, y, 0);
-							}
-							else{
-								game.playerAction(Action.RAISE, y, Integer.parseInt(arg1.substring("RAISE ".length(), arg1.length() - 1)));
-							}
-							Player x = game.getNextPlayer();
-							if(x == null){
-								game.nextStage();
-							}
-							else{
-								ClientConnection.getWarpClient().sendPrivateChat(x.getName(), "MAX BET: " + game.getMaxBet());
-							}
+			@Override
+			public void onGameStopped(String arg0, String arg1) {
+
+			}
+
+			@Override
+			public void onMoveCompleted(MoveEvent arg0) {
+
+			}
+
+			@Override
+			public void onPrivateChatReceived(String arg0, String arg1) {
+				System.out.println(arg0);
+				System.out.println(arg1);
+				ArrayList<Player> players = game.getPlayers();
+				for(Player y: players){
+					if(y.getName().equals(arg0)){
+						if(arg1.contains("CALL")){
+							game.playerAction(Action.CALL, y, 0);
+						}
+						else if(arg1.contains("FOLD")){
+							game.playerAction(Action.FOLD, y, 0);
+						}
+						else{
+							game.playerAction(Action.RAISE, y, Integer.parseInt(arg1.substring("RAISE ".length(), arg1.length())));
+						}
+						
+						Player x = game.getNextPlayer();
+						if(x == null){
+							game.nextStage();
 							if(game.nrPlayersForAction() <= 1){
 								while(game.getGameIteration() < 4){
 									game.nextStage();
 								}
 							}
 						}
-					}
-					
-				}
-
-				@Override
-				public void onPrivateUpdateReceived(String arg0, byte[] arg1,
-						boolean arg2) {
-					
-				}
-
-				@Override
-				public void onRoomCreated(RoomData arg0) {
-					
-				}
-
-				@Override
-				public void onRoomDestroyed(RoomData arg0) {
-					
-				}
-
-				@Override
-				public void onUpdatePeersReceived(UpdateEvent arg0) {
-					
-				}
-
-				@Override
-				public void onUserChangeRoomProperty(RoomData arg0, String arg1,
-						HashMap<String, Object> arg2, HashMap<String, String> arg3) {
-				}
-
-				@Override
-				public void onUserJoinedLobby(LobbyData arg0, String arg1) {
-				}
-
-				@Override
-				public synchronized void onUserJoinedRoom(RoomData arg0, String arg1) {
-					waitingList.add(new Player(money,arg1));
-					if (!inGame && waitingList.size() + game.getPlayers().size() >= 2){
-						inGame = true;
-						game.addRound(waitingList);
-						waitingList.clear();
-						startAction();
+						else{
+							String message = "MAX BET: " + game.getMaxBet();
+							ServerConnection.getWarpClient().sendPrivateChat(x.getName(), message);
+						}
+						break;
 					}
 				}
 
-				@Override
-				public void onUserLeftLobby(LobbyData arg0, String arg1) {
-				}
+			}
 
-				@Override
-				public void onUserLeftRoom(RoomData arg0, String arg1) {			
-				}
+			@Override
+			public void onPrivateUpdateReceived(String arg0, byte[] arg1,
+					boolean arg2) {
 
-				@Override
-				public void onUserPaused(String arg0, boolean arg1, String arg2) {				
-				}
+			}
 
-				@Override
-				public void onUserResumed(String arg0, boolean arg1, String arg2) {				
+			@Override
+			public void onRoomCreated(RoomData arg0) {
+
+			}
+
+			@Override
+			public void onRoomDestroyed(RoomData arg0) {
+
+			}
+
+			@Override
+			public void onUpdatePeersReceived(UpdateEvent arg0) {
+
+			}
+
+			@Override
+			public void onUserChangeRoomProperty(RoomData arg0, String arg1,
+					HashMap<String, Object> arg2, HashMap<String, String> arg3) {
+			}
+
+			@Override
+			public void onUserJoinedLobby(LobbyData arg0, String arg1) {
+			}
+
+			@Override
+			public synchronized void onUserJoinedRoom(RoomData arg0, String arg1) {
+				waitingList.add(new Player(money,arg1));
+				if (!inGame && waitingList.size() + game.getPlayers().size() >= 2){
+					inGame = true;
+					game.addRound(waitingList);
+					waitingList.clear();
+					startAction();
 				}
-				
-			});
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+			}
+
+			@Override
+			public void onUserLeftLobby(LobbyData arg0, String arg1) {
+			}
+
+			@Override
+			public void onUserLeftRoom(RoomData arg0, String arg1) {			
+			}
+
+			@Override
+			public void onUserPaused(String arg0, boolean arg1, String arg2) {				
+			}
+
+			@Override
+			public void onUserResumed(String arg0, boolean arg1, String arg2) {				
+			}
+
+		});
 	}
 	
 	private void startAction() {
 		Player current = game.getNextPlayer();
-		ClientConnection.getWarpClient().sendPrivateChat(current.getName(), "MAX BET: " + game.getMaxBet());
+		String message = "MAX BET: " + game.getMaxBet();
+		ServerConnection.getWarpClient().sendPrivateChat(current.getName(), message);
 	}
 	
 	@Override

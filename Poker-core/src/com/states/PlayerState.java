@@ -8,6 +8,7 @@ import java.util.HashMap;
 
 import com.Poker.logic.Card;
 import com.Poker.logic.Player;
+import com.Poker.logic.Player.Action;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -65,7 +66,19 @@ public class PlayerState implements GameState {
 
 			@Override
 			public void onChatReceived(ChatEvent arg0) {
-				player.resetIterationBet();
+				
+				if(arg0.getMessage().contains("END")){
+					if(player.inGame()){
+						moveUpCards();
+					}
+					player.setAllIn(false);
+					if(player.getMoney() > 0){
+						player.setInGame();
+					}
+				}
+				else{
+					player.resetIterationBet();
+				}
 			}
 
 			@Override
@@ -87,12 +100,12 @@ public class PlayerState implements GameState {
 			public void onPrivateChatReceived(String arg0, String arg1) {
 				if(arg0.endsWith("server")){
 					if(arg1.startsWith("MAX BET: ")){
-						String amount = arg1.substring(("MAX BET: ").length() - 1, arg1.length() - 1);
+						String amount = arg1.substring(("MAX BET: ").length(), arg1.length());
 						int maxBet = Integer.parseInt(amount);
 						chooseAction(maxBet);
 					}
 					else if(arg1.startsWith("WIN: ")){
-						String amount = arg1.substring(("WIN: ").length(), arg1.length() - 1);
+						String amount = arg1.substring(("WIN: ").length(), arg1.length());
 						int pot = Integer.parseInt(amount);
 						player.addMoney(pot);
 					}
@@ -227,11 +240,22 @@ public class PlayerState implements GameState {
 		else
 			cardBackRight.addAction(Actions.moveBy(0, -stage.getHeight(), 1.5f));
 	}
+	
+	public void moveUpCards(){
+		cardBackLeft.addAction(Actions.moveBy(0, stage.getHeight(), 1.0f));
+		cardBackRight.addAction(Actions.moveBy(0, stage.getHeight(), 1.0f));
+	}
 	private void chooseAction(int maxBet) {
-		t.start();
+		//t.start();
 		Gdx.input.vibrate(1000);
+		player.update(Action.CALL, maxBet, 0);
 		ClientConnection.getWarpClient().sendPrivateChat(serverName,Player.Action.CALL.toString());
-		t.interrupt();
+		/*try{
+			t.interrupt();
+		}
+		catch(Exception e){
+			e.printStackTrace();
+		}*/
 	}
 
 }

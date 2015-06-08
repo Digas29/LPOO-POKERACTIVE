@@ -23,6 +23,7 @@ public class PokerGame {
 		pot  = 0;
 		maxBet = 0;
 		players = new ArrayList<Player>();
+		winners = new ArrayList<Player>();
 		rounds = new ArrayList<Round>();
 		playersQueue = new LinkedList<Player>();	
 	}
@@ -109,8 +110,9 @@ public class PokerGame {
 			break;
 		case 4:		
 			ArrayList<Integer> winnersIndex = rounds.get(rounds.size()-1).getWinners();
+			winners.clear();
 			for(Integer x : winnersIndex){
-				winners.add(players.get(x));
+				winners.add(players.get(x.intValue()));
 			}
 			listener.gameEvent(new GameEvent("END",0));
 			return;
@@ -119,6 +121,7 @@ public class PokerGame {
 		}
 		System.out.println(rounds.get(rounds.size()-1) + "");
 		prepareQueue();
+		listener.gameEvent(new GameEvent("NEXT TURN",0));
 	}
 
 	public int nrPlayersForAction(){

@@ -90,7 +90,7 @@ public class Round {
     				winners.clear();
     				winners.add(i);
     			}
-    			else if ((!winners.isEmpty() && temp.get(i).compareTo(temp.get(winners.get(0).intValue())) == 1) 
+    			else if ((!winners.isEmpty() && temp.get(i).compareTo(temp.get(winners.get(0).intValue())) == 0) 
     					|| winners.isEmpty()){
     				winners.add(i);
     			}

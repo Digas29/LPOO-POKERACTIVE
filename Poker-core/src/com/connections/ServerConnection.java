@@ -99,7 +99,6 @@ public class ServerConnection extends ConnectionStrategy {
 			public void onJoinRoomDone(RoomEvent arg0) {
 				if(arg0.getResult() == WarpResponseResultCode.SUCCESS){
 					getWarpClient().subscribeRoom(arg0.getData().getId());
-					StateMachine.getStateMachine().switchState(States.BOARD);
 				}
 				else{
 					getWarpClient().deleteRoom(arg0.getData().getId());
@@ -123,7 +122,12 @@ public class ServerConnection extends ConnectionStrategy {
 
 			@Override
 			public void onSubscribeRoomDone(RoomEvent arg0) {
-				
+				if(arg0.getResult() == WarpResponseResultCode.SUCCESS){
+					StateMachine.getStateMachine().switchState(States.BOARD);
+				}
+				else{
+					getWarpClient().subscribeRoom(arg0.getData().getId());
+				}
 			}
 
 			@Override
