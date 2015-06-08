@@ -40,7 +40,6 @@ import com.utils.GameState;
 public class PlayerState implements GameState {
 
 	private Texture cardsBackTexture;
-	private Texture cardsTexture;
 	private Stage stage;
 	private Table tableL;
 	private Table tableR;
@@ -52,7 +51,6 @@ public class PlayerState implements GameState {
 	private final int waitResponce = 15;
 	private String serverName = null;
 	private Skin skinButtons;
-	private Skin skinCards;
 	private BitmapFont font;
 	private TextureAtlas atlasButtons;
 	private TextureAtlas atlasCards;
@@ -77,7 +75,6 @@ public class PlayerState implements GameState {
 		atlasButtons = new TextureAtlas(Gdx.files.internal("img/action_buttons.atlas"));
 		atlasCards = new TextureAtlas(Gdx.files.internal("img/cards.txt"));
 		skinButtons = new Skin(atlasButtons);
-		skinCards = new Skin(atlasCards);
 		style = new TextButtonStyle();
         style.font = font;
         style.fontColor = Color.BLACK;
@@ -141,7 +138,7 @@ public class PlayerState implements GameState {
 			}
 
 			@Override
-			public void onPrivateUpdateReceived(String arg0, byte[] arg1,
+			public synchronized void onPrivateUpdateReceived(String arg0, byte[] arg1,
 					boolean arg2) {
 				if(serverName == null)
 					serverName = arg0;

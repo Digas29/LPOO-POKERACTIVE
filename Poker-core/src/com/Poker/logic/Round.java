@@ -7,7 +7,6 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 
 import com.connections.ServerConnection;
-import com.shephertz.app42.gaming.multiplayer.client.WarpClient;
 
 public class Round {
 	private ArrayList<Player> players;
@@ -15,35 +14,12 @@ public class Round {
 	private Card[] board = new Card[5];
 	
 	public Round(ArrayList<Player> p){
-		ByteArrayOutputStream bos = new ByteArrayOutputStream();
-		ObjectOutput out = null;
 		this.players = p;
 		deck = new Deck();
 		for(int j = 0; j < 2; j++){
 			for (int i = 0; i < players.size(); i++) {
 				if(players.get(i).inGame()){
 					players.get(i).addCard(deck);
-					try {
-						out = new ObjectOutputStream(bos);   
-						out.writeObject(players.get(i).getCards().get(j));
-						byte[] yourBytes = bos.toByteArray();
-						ServerConnection.getWarpClient().sendPrivateUpdate(players.get(i).getName(), yourBytes);
-
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-					finally {
-						try {
-							if (out != null) {
-								out.close();
-							}
-						} catch (IOException ex) {
-						}
-						try {
-							bos.close();
-						} catch (IOException ex) {
-						}
-					}
 				}
 			}
 		}
