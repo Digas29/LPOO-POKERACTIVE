@@ -13,14 +13,18 @@ import com.Poker.logic.PokerGame;
 import com.Poker.events.GameEvent;
 import com.Poker.events.GameListener;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.TextField;
-import com.badlogic.gdx.scenes.scene2d.ui.TextField.TextFieldStyle;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.connections.ServerConnection;
 import com.shephertz.app42.gaming.multiplayer.client.events.ChatEvent;
@@ -39,17 +43,39 @@ public class BoardState implements GameState{
 	private ArrayList<Player> waitingList;
 	private Texture background;
 	private TextureAtlas circles;
-	private ArrayList<TextField> textFields;
-	private TextFieldStyle style;
+	private ArrayList<Label> textFields;
+	private LabelStyle style1;
+	private LabelStyle style2;
+	private LabelStyle style3;
+	private LabelStyle style4;
+	private LabelStyle style5;
+	private LabelStyle style6;
 	private Table table;
+	private Table table2;
 	private Stage stage;
+	private BitmapFont font;
+	private Skin skin;
 	
 	public BoardState(){
-		textFields = new ArrayList<TextField>();
-		background = new Texture(Gdx.files.internal("img/board.png"));
-		circles = new TextureAtlas(Gdx.files.internal("img/cirlces.atlas"));
+		font = new BitmapFont(Gdx.files.internal("fonts/trench.fnt"));
 		stage = new Stage(new FitViewport(1920,1080));
+		style1 = new LabelStyle();
+		circles = new TextureAtlas(Gdx.files.internal("img/circle.atlas"));
 		table = new Table();
+		table2 = new Table();
+		table.setBounds(0, 0, stage.getWidth(), stage.getHeight());
+		table2.setBounds(0, 0, stage.getWidth(), stage.getHeight());
+		skin = new Skin(circles);
+		style1.fontColor = Color.BLACK;
+		style1.font = font;
+		style1.background = skin.getDrawable("circle_up");
+		style2 = new LabelStyle(style1);
+		style3 = new LabelStyle(style1);
+		style4 = new LabelStyle(style1);
+		style5 = new LabelStyle(style1);
+		style6 = new LabelStyle(style1);
+		textFields = new ArrayList<Label>();
+		background = new Texture(Gdx.files.internal("img/board.png"));
 		game = new PokerGame();
 		game.addGameListener(new GameListener(){
 
@@ -74,6 +100,13 @@ public class BoardState implements GameState{
 						inGame = true;
 						game.addRound(waitingList);
 						waitingList.clear();
+						for(int i = 0; i < textFields.size(); i++){
+							textFields.get(i).setText("");
+						}
+						for(int i = 0; i < game.getPlayers().size(); i++){
+							Player p = game.getPlayers().get(i);
+							textFields.get(i).setText(p.getName() + "\n" + "$" + p.getMoney());
+						}
 						sendCards();
 						startAction();
 					}
@@ -125,6 +158,7 @@ public class BoardState implements GameState{
 	
 	@Override
 	public void create() {
+		Gdx.input.setInputProcessor(stage);
 		ServerConnection.getWarpClient().addNotificationListener(new NotifyListener(){
 
 			@Override
@@ -149,11 +183,10 @@ public class BoardState implements GameState{
 
 			@Override
 			public void onPrivateChatReceived(String arg0, String arg1) {
-				System.out.println(arg0);
-				System.out.println(arg1);
 				ArrayList<Player> players = game.getPlayers();
 				for(Player y: players){
 					if(y.getName().equals(arg0)){
+						textFields.get(game.getPlayers().indexOf(y)).getStyle().background = skin.getDrawable("circle_up");
 						if(arg1.contains("CALL")){
 							game.playerAction(Action.CALL, y, 0);
 						}
@@ -174,6 +207,7 @@ public class BoardState implements GameState{
 							game.nextStage();
 						}
 						else{
+							textFields.get(game.getPlayers().indexOf(x)).getStyle().background = skin.getDrawable("circle_selected");
 							String message = "MAX BET: " + game.getMaxBet();
 							ServerConnection.getWarpClient().sendPrivateChat(x.getName(), message);
 						}
@@ -220,6 +254,13 @@ public class BoardState implements GameState{
 					inGame = true;
 					game.addRound(waitingList);
 					waitingList.clear();
+					for(int i = 0; i < textFields.size(); i++){
+						textFields.get(i).setText("");
+					}
+					for(int i = 0; i < game.getPlayers().size(); i++){
+						Player p = game.getPlayers().get(i);
+						textFields.get(i).setText(p.getName() + "\n" + "$" + p.getMoney());
+					}
 					sendCards();
 					startAction();
 				}
@@ -242,18 +283,64 @@ public class BoardState implements GameState{
 			}
 
 		});
-		table.setBounds(0, 0, stage.getWidth(), stage.getWidth());
 		
+		textFields.clear();
 		TextureRegion region = new TextureRegion(background, 0, 0, background.getWidth(), background.getHeight());
 		Image img = new Image(region);
 		img.moveBy((stage.getWidth() - img.getWidth())/2.0f, (stage.getHeight() - img.getHeight())/2.0f);
 		table.addActor(img);
 		
+		Label n1 = new Label("", style1);
+		Label n2 = new Label("", style2);
+		Label n3 = new Label("", style3);
+		Label n4 = new Label("", style4);
+		Label n5 = new Label("", style5);
+		Label n6 = new Label("", style6);
+		textFields.add(n1);
+		n1.setPosition(0.35f * stage.getWidth(), 0.8125f * stage.getHeight());
+		n1.setFontScale(0.5f);
+		n1.setAlignment(Align.center);
+		n1.setSize(200.0f, 200.0f);
+		textFields.add(n2);
+		n2.setPosition(0.55f * stage.getWidth(), 0.8125f * stage.getHeight());
+		n2.setFontScale(0.5f);
+		n2.setAlignment(Align.center);
+		n2.setSize(200.0f, 200.0f);
+		textFields.add(n3);
+		n3.setPosition(0.8825f * stage.getWidth(), 0.4f * stage.getHeight());
+		n3.setFontScale(0.5f);
+		n3.setAlignment(Align.center);
+		n3.setSize(200.0f, 200.0f);
+		textFields.add(n4);
+		n4.setPosition(0.55f * stage.getWidth(), 0.0f * stage.getHeight());
+		n4.setFontScale(0.5f);
+		n4.setAlignment(Align.center);
+		n4.setSize(200.0f, 200.0f);
+		textFields.add(n5);
+		n5.setPosition(0.35f * stage.getWidth(), 0.0f * stage.getHeight());
+		n5.setFontScale(0.5f);
+		n5.setAlignment(Align.center);
+		n5.setSize(200.0f, 200.0f);
+		textFields.add(n6);
+		n6.setPosition(0.0175f * stage.getWidth(), 0.4f * stage.getHeight());
+		n6.setFontScale(0.5f);
+		n6.setAlignment(Align.center);
+		n6.setSize(200.0f, 200.0f);
+		table2.setLayoutEnabled(false);
+		table2.add(n1);
+		table2.add(n2);
+		table2.add(n6);
+		table2.add(n3);
+		table2.add(n5);
+		table2.add(n4);
+		table2.center();
 		stage.addActor(table);
+		stage.addActor(table2);
 	}
 	
 	private void startAction() {
 		Player current = game.getNextPlayer();
+		textFields.get(game.getPlayers().indexOf(current)).getStyle().background = skin.getDrawable("circle_selected");
 		String message = "MAX BET: " + game.getMaxBet();
 		ServerConnection.getWarpClient().sendPrivateChat(current.getName(), message);
 	}
