@@ -1,0 +1,33 @@
+
+table.png
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+table_down_left
+  rotate: false
+  xy: 1, 145
+  size: 400, 70
+  orig: 400, 70
+  offset: 0, 0
+  index: -1
+table_down_right
+  rotate: false
+  xy: 1, 73
+  size: 400, 70
+  orig: 400, 70
+  offset: 0, 0
+  index: -1
+table_up_left
+  rotate: false
+  xy: 403, 145
+  size: 400, 70
+  orig: 400, 70
+  offset: 0, 0
+  index: -1
+table_up_right
+  rotate: false
+  xy: 1, 1
+  size: 400, 70
+  orig: 400, 70
+  offset: 0, 0
+  index: -1
